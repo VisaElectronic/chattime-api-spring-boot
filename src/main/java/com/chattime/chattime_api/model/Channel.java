@@ -5,17 +5,13 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "messages")
-public class Message {
+@Table(name = "channels")
+public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String content;
-
-    @ManyToOne
-    @JoinColumn(name = "channel_id", referencedColumnName = "id")
-    private Channel channel;
+    private String key;
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
@@ -26,12 +22,6 @@ public class Message {
 
     @Column(name = "updated_at")
     private Date updatedAt;
-
-    public Message(String content, User user, Channel channel) {
-        this.content = content;
-        this.createdBy = user;
-        this.channel = channel;
-    }
 
     // Getters and setters
     public Long getId() {
@@ -50,12 +40,12 @@ public class Message {
         this.name = name;
     }
 
-    public String getContent() {
-        return content;
+    public String getKey() {
+        return key;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public User getCreatedBy() {

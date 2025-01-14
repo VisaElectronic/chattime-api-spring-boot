@@ -4,6 +4,9 @@ import com.chattime.chattime_api.dto.UserDto;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,12 @@ import org.springframework.stereotype.Service;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationManager authManager;
+
+    @Autowired
+    private JWTService jwtService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -20,5 +29,14 @@ public class UserService {
             encoder.encode(userDto.getPassword())
         );
         return userRepository.save(user);
+    }
+
+    public String verify(UserDto userDto) {
+        Authentication authentication =
+                authManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
+        if(authentication.isAuthenticated()) {
+            return jwtService.generateToken(userDto.getEmail());
+        }
+        return "Failed";
     }
 }
