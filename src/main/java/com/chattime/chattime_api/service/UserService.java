@@ -25,6 +25,7 @@ public class UserService {
 
     public User register(UserDto userDto) {
         User user = new User(
+            userDto.getUsername(),
             userDto.getEmail(),
             encoder.encode(userDto.getPassword())
         );
@@ -32,11 +33,16 @@ public class UserService {
     }
 
     public String verify(UserDto userDto) {
+        User user = userRepository.findByEmail(userDto.getEmail());
         Authentication authentication =
                 authManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
         if(authentication.isAuthenticated()) {
-            return jwtService.generateToken(userDto.getEmail());
+            return jwtService.generateToken(user);
         }
-        return "Failed";
+        throw new RuntimeException("Invalid credentials");
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

@@ -2,16 +2,16 @@ package com.chattime.chattime_api.dto;
 
 public class MessageDto {
     private String content;
-    private Long channelId;
-    private Long userId;
+    private String channelId;
+    private String type;
 
     public MessageDto() {
     }
 
-    public MessageDto(String content, Long channelId, Long userId) {
+    public MessageDto(String content, String channelId, String type) {
         this.content = content;
         this.channelId = channelId;
-        this.userId = userId;
+        this.type = type;
     }
 
     public String getContent() {
@@ -22,19 +22,19 @@ public class MessageDto {
         this.content = content;
     }
 
-    public Long getChannelId() {
+    public String getChannelId() {
         return channelId;
     }
 
-    public void setChannelId(Long channelId) {
+    public void setChannelId(String channelId) {
         this.channelId = channelId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getType() {
+        return type;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setType(String type) {
+        this.type = type;
     }
 }

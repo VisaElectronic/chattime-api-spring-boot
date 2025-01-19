@@ -1,5 +1,6 @@
 package com.chattime.chattime_api.service;
 
+import com.chattime.chattime_api.model.SocketUserPrincipal;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.model.UserPrincipal;
 import com.chattime.chattime_api.repository.UserRepository;
@@ -22,6 +23,10 @@ public class AuthUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         return new UserPrincipal(user);
+    }
+
+    public SocketUserPrincipal getSocketPrincipal(UserDetails userDetails) {
+        return new SocketUserPrincipal(((UserPrincipal) userDetails).getUser());
     }
     
 }

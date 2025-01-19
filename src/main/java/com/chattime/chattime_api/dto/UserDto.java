@@ -1,6 +1,7 @@
 package com.chattime.chattime_api.dto;
 
 public class UserDto {
+    private String username;
     private String email;
     private String password;
 
@@ -26,5 +27,13 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

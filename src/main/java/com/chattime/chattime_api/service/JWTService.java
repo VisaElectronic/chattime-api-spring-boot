@@ -1,9 +1,14 @@
 package com.chattime.chattime_api.service;
 
+import com.chattime.chattime_api.dto.UserDto;
+import com.chattime.chattime_api.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +24,18 @@ public class JWTService {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("username", user.getUsername());
+        claims.put("email", user.getEmail());
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(email)
+                .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30 * 1000))
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 24 * 1000))
                 .and()
                 .signWith(getKey())
                 .compact();

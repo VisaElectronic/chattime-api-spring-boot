@@ -1,25 +1,35 @@
 package com.chattime.chattime_api.controller;
 
-import com.chattime.chattime_api.dto.UserDto;
+import com.chattime.chattime_api.dto.response.BaseResponse;
+import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/user")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public User register(@RequestBody UserDto userDto) {
-        return userService.register(userDto);
-    }
-
-    @PostMapping("/login")
-    public String login(@RequestBody UserDto userDto) {
-        return userService.verify(userDto);
+    @GetMapping("/profile")
+    public BaseResponse<ProfileDataResponse> profile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = null;
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            email = ((UserDetails) authentication.getPrincipal()).getUsername();
+        }
+        User user = userService.findByEmail(email);
+        return new BaseResponse<>(true, new ProfileDataResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail()
+        ));
     }
 }

@@ -26,14 +26,7 @@ public class MessageService {
     @Autowired
     private ChannelRepository channelRepository;
 
-    public Message addMessage(MessageDto messageDto) {
-        User user = userRepository.findById(messageDto.getUserId()).orElseThrow();
-        Channel channel = channelRepository.findById(messageDto.getChannelId()).orElseThrow();
-        Message message = new Message(
-            messageDto.getContent(),
-            user,
-            channel
-        );
+    public Message addMessage(Message message) {
         return messageRepository.save(message);
     }
 

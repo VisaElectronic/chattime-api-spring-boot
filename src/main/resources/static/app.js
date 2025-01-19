@@ -5,9 +5,13 @@ const stompClient = new StompJs.Client({
 stompClient.onConnect = (frame) => {
   setConnected(true);
   console.log("Connected: " + frame);
+  // Custom headers to send along with the subscription
+    const headers = {
+      'Authorization': 'custom-value'
+    };
   stompClient.subscribe("/channel/1234/subscribe", (greeting) => {
     showGreeting(JSON.parse(greeting.body).content);
-  });
+  }, headers);
 };
 
 stompClient.onWebSocketError = (error) => {
@@ -42,10 +46,9 @@ function disconnect() {
 
 function sendName() {
   stompClient.publish({
-    destination: "/app/channel/1234/publish",
+    destination: "/app/channel/1234/chat",
     body: JSON.stringify({
-        sender: $("#name").val(),
-        content: "hello world",
+        authToken: $("#token").val(),
     }),
     callback: (message) => {
       console.log(message);
