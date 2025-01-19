@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest().authenticated()
             )
+            .logout((logout) -> logout.logoutUrl("logout"))
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )

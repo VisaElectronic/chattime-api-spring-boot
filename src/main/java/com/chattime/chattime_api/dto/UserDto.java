@@ -1,16 +1,24 @@
 package com.chattime.chattime_api.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
 public class UserDto {
     private String username;
     private String email;
     private String password;
+    private List<MultipartFile> files;
 
     public UserDto() {
     }
 
-    public UserDto(String email, String password) {
+    public UserDto(String email, String password, List<MultipartFile> files) {
         this.email = email;
         this.password = password;
+        if(files != null && !files.isEmpty()) {
+            this.files = files;
+        }
     }
 
     public String getEmail() {
@@ -35,5 +43,13 @@ public class UserDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<MultipartFile> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<MultipartFile> files) {
+        this.files = files;
     }
 }
