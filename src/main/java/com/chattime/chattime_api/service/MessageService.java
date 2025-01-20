@@ -1,18 +1,17 @@
 package com.chattime.chattime_api.service;
 
-import com.chattime.chattime_api.dto.MessageDto;
-import com.chattime.chattime_api.model.Channel;
-import com.chattime.chattime_api.model.User;
+import com.chattime.chattime_api.model.*;
 import com.chattime.chattime_api.repository.ChannelRepository;
 import com.chattime.chattime_api.repository.MessageRepository;
 import com.chattime.chattime_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
-
-import com.chattime.chattime_api.model.Message;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class MessageService {
@@ -32,5 +31,11 @@ public class MessageService {
 
     public List<Message> getMessagesByChannel(Channel channel) {
         return new ArrayList<>(messageRepository.findByChannelId(channel.getId()));
+    }
+
+    public User getUserFromSocketConnection(StompHeaderAccessor headerAccessor) {
+        Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
+        UserPrincipal user = (UserPrincipal) Objects.requireNonNull(sessionAttributes).get("user");
+        return user.getUser();
     }
 }

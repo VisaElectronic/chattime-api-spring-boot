@@ -13,11 +13,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
     @Autowired
     private UserService userService;
+
+    // implement list of users with pagination
+    @GetMapping("")
+    public BaseResponse<List<ProfileDataResponse>> list() {
+        List<User> users = userService.findAll();
+        return new BaseResponse<>(true, ProfileDataResponse.fromList(users));
+    }
 
     @GetMapping("/profile")
     public BaseResponse<ProfileDataResponse> profile() {

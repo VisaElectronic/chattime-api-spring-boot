@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -33,9 +34,14 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(
                 request -> request
-                        .requestMatchers("/index.html", "/app.js", "/error", "register", "login")
+                        .requestMatchers(
+                                "/uploads/**",
+                                "/register",
+                                "/login",
+                                "/ws"
+                        )
                         .permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/**").authenticated()
             )
             .logout((logout) -> logout.logoutUrl("logout"))
             .sessionManagement(

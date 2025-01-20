@@ -8,21 +8,24 @@ import com.chattime.chattime_api.dto.response.register.RegisterDataResponse;
 import com.chattime.chattime_api.dto.response.register.RegisterResponse;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.service.UserService;
+import com.chattime.chattime_api.service.UtilService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 public class AuthUserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UtilService utilService;
 
     @PostMapping("/register")
     public RegisterResponse register(
@@ -31,31 +34,25 @@ public class AuthUserController {
         @RequestParam("password") String password,
         @RequestPart("files") List<MultipartFile> files
     ) {
-        UserDto userDto = new UserDto(email, password, files);
-        User user = userService.register(userDto);
-        if (userDto.getFiles() != null) {
-            userDto.getFiles().forEach(file -> {
+        final List<Path> filePath = new ArrayList<>(List.of());
+        if (files != null) {
+            files.forEach(file -> {
                 try {
-                    saveFile(file);
+                    filePath.add(utilService.saveFile(file));
                 } catch (IOException e) {
                     throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
                 }
             });
         }
+        String[] parts = !filePath.isEmpty() ? filePath.getFirst().toString().split("/") : new String[0];
+        String avatarPath = parts.length > 4 ? String.join("/", Arrays.copyOfRange(parts, 4, parts.length)) : null;
+        UserDto userDto = new UserDto(email, password, avatarPath);
+        User user = userService.register(userDto);
         return new RegisterResponse(true, new RegisterDataResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail())
         );
-    }
-
-    private void saveFile(MultipartFile file) throws IOException {
-        Path resourceDirectory = Paths.get("src", "main", "resources", "uploads");
-        if (!Files.exists(resourceDirectory)) {
-            Files.createDirectories(resourceDirectory);
-        }
-        Path filePath = resourceDirectory.resolve(Objects.requireNonNull(file.getOriginalFilename()));
-        Files.write(filePath, file.getBytes());
     }
 
     @PostMapping("/login")

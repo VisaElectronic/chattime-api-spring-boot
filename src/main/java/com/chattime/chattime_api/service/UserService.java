@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
     @Autowired
@@ -27,7 +29,8 @@ public class UserService {
         User user = new User(
             userDto.getUsername(),
             userDto.getEmail(),
-            encoder.encode(userDto.getPassword())
+            encoder.encode(userDto.getPassword()),
+            userDto.getAvatar()
         );
         return userRepository.save(user);
     }
@@ -44,5 +47,9 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

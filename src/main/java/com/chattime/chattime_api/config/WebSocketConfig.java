@@ -7,6 +7,7 @@ import com.chattime.chattime_api.service.JWTService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -17,8 +18,10 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -70,14 +73,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     String username = jwtService.extractUserName(wsToken.getAuthToken());
                     if (username != null) {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                        accessor.setUser(userDetailsService.getSocketPrincipal(userDetails));
                         sessionAttributes.put("user", userDetails);
                         accessor.setSessionAttributes(sessionAttributes);
                         return message;
                     }
                     return null;
                 }
-                return null;
+                return message;
             }
         });
     }

@@ -1,5 +1,10 @@
 package com.chattime.chattime_api.dto.response.user;
 
+import com.chattime.chattime_api.model.User;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ProfileDataResponse {
     private Long id;
     private String username;
@@ -37,5 +42,13 @@ public class ProfileDataResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public static List<ProfileDataResponse> fromList(List<User> users) {
+        return users.stream().map(user -> new ProfileDataResponse(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail()
+        )).collect(Collectors.toList());
     }
 }

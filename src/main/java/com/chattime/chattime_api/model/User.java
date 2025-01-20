@@ -15,6 +15,7 @@ public class User {
     private String username;
     private String email;
     private String password;
+    private String avatar;
     @Column(name = "created_at")
     private Date createdAt;
     @Column(name = "updated_at")
@@ -23,10 +24,11 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, String avatar) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.avatar = avatar;
     }
 
     public Long getId() {
@@ -59,5 +61,13 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

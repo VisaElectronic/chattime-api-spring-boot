@@ -23,6 +23,15 @@ public class Channel {
     @Column(name = "updated_at")
     private Date updatedAt;
 
+    // Constructors
+    public Channel() {
+    }
+
+    public Channel(String key, String name) {
+        this.key = key;
+        this.name = name;
+    }
+
     // Getters and setters
     public Long getId() {
         return id;
