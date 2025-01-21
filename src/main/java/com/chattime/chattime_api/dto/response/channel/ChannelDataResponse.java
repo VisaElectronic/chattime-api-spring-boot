@@ -1,6 +1,9 @@
 package com.chattime.chattime_api.dto.response.channel;
 
 import com.chattime.chattime_api.model.Channel;
+import com.chattime.chattime_api.model.User;
+import com.chattime.chattime_api.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,11 +12,25 @@ public class ChannelDataResponse {
     private Long id;
     private String key;
     private String name;
+    private int status;
+    private boolean isGroup = false;
+    private User user;
 
-    public ChannelDataResponse(Long id, String key, String name) {
+    @Autowired
+    private UserService userService;
+
+    public ChannelDataResponse(
+            Long id,
+            String key,
+            String name,
+            int status,
+            User user
+    ) {
         this.id = id;
         this.key = key;
         this.name = name;
+        this.status = status;
+        this.user = user;
     }
 
     public Long getId() {
@@ -44,7 +61,33 @@ public class ChannelDataResponse {
         return channels.stream().map(channel -> new ChannelDataResponse(
             channel.getId(),
             channel.getKey(),
-            channel.getName()
+            channel.getName(),
+            channel.getStatus(),
+            channel.getUser()
         )).collect(Collectors.toList());
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public boolean isGroup() {
+        return isGroup;
+    }
+
+    public void setGroup(boolean group) {
+        isGroup = group;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

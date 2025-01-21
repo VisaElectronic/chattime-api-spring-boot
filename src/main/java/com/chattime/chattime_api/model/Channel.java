@@ -11,7 +11,13 @@ public class Channel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Column(name = "key")
     private String key;
+    private int status; // 1 for active, 0 for inactive
+
+    @OneToOne
+    @JoinColumn(name = "key", referencedColumnName = "key", insertable=false, updatable=false)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
@@ -27,9 +33,10 @@ public class Channel {
     public Channel() {
     }
 
-    public Channel(String key, String name) {
+    public Channel(String key, String name, int status) {
         this.key = key;
         this.name = name;
+        this.status = status;
     }
 
     // Getters and setters
@@ -79,5 +86,22 @@ public class Channel {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public User getUser() {
+        user.setPassword(null);
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

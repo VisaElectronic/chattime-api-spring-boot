@@ -46,7 +46,7 @@ public class AuthUserController {
         }
         String[] parts = !filePath.isEmpty() ? filePath.getFirst().toString().split("/") : new String[0];
         String avatarPath = parts.length > 4 ? String.join("/", Arrays.copyOfRange(parts, 4, parts.length)) : null;
-        UserDto userDto = new UserDto(email, password, avatarPath);
+        UserDto userDto = new UserDto(username, email, password, avatarPath);
         User user = userService.register(userDto);
         return new RegisterResponse(true, new RegisterDataResponse(
                 user.getId(),

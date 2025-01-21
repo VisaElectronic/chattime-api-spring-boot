@@ -52,4 +52,8 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
+
+    public User findByKey(String key) {
+        return userRepository.findByKey(key);
+    }
 }

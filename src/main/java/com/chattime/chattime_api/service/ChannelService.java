@@ -17,12 +17,22 @@ public class ChannelService {
     }
 
     public Channel create(String key, String name) {
-        Channel channel = new Channel(key, name);
+        Channel channel = channelRepository.findByKey(key);
+        if (channel != null) {
+            channel.setName(name);
+            channel.setStatus(1); // Assuming you want to set the status to active
+        } else {
+            channel = new Channel(key, name, 1);
+        }
         return channelRepository.save(channel);
     }
 
-    // list all channels
     public List<Channel> findAll() {
         return channelRepository.findAll();
+    }
+
+    // list all active channels
+    public List<Channel> findAllActive() {
+        return channelRepository.findAllByStatus(1);
     }
 }

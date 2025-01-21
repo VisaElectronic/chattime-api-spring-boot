@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 
 import com.chattime.chattime_api.service.MessageService;
 
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -53,22 +54,21 @@ public class MessageController {
         return new BaseResponse<>(true, new ProfileDataResponse(
                 user.getId(),
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getAvatar(),
+                user.getKey()
         ));
     }
 
     @MessageMapping("/channel/connect")
     @SendTo("/channel/online")
-    public BaseResponse<ChannelDataResponse> onlineUserSocket(
+    public BaseResponse<List<ChannelDataResponse>> onlineUserSocket(
             ConnectOnlineDto connectDto,
             StompHeaderAccessor headerAccessor
     ) {
         User user = messageService.getUserFromSocketConnection(headerAccessor);
-        Channel channel = channelService.create(connectDto.getChannelId().toString(), "testing");
-        return new BaseResponse<>(true, new ChannelDataResponse(
-                channel.getId(),
-                channel.getKey(),
-                channel.getName()
-        ));
+        channelService.create(connectDto.getChannelId(), user.getUsername());
+        List<Channel> channels = channelService.findAllActive();
+        return new BaseResponse<>(true, ChannelDataResponse.fromList(channels));
     }
 }

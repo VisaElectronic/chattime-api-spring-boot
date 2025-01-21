@@ -14,7 +14,13 @@ public class UserDto {
     public UserDto() {
     }
 
-    public UserDto(String email, String password, @Nullable String avatar) {
+    public UserDto(
+        String username,
+        String email,
+        String password,
+        @Nullable String avatar
+    ) {
+        this.username = username;
         this.email = email;
         this.password = password;
         this.avatar = avatar;

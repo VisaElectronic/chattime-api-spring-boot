@@ -1,5 +1,6 @@
 package com.chattime.chattime_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenerationTime;
 
@@ -13,6 +14,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
+    private String key;
     private String email;
     private String password;
     private String avatar;
@@ -29,6 +31,7 @@ public class User {
         this.password = password;
         this.email = email;
         this.avatar = avatar;
+        this.key = java.util.UUID.randomUUID().toString();
     }
 
     public Long getId() {
@@ -69,5 +72,13 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

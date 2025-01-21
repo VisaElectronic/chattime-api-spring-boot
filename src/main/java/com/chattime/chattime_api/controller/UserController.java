@@ -39,7 +39,9 @@ public class UserController {
         return new BaseResponse<>(true, new ProfileDataResponse(
                 user.getId(),
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getAvatar(),
+                user.getKey()
         ));
     }
 }

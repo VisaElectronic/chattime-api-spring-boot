@@ -3,7 +3,9 @@ package com.chattime.chattime_api.controller;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.channel.ChannelDataResponse;
 import com.chattime.chattime_api.model.Channel;
+import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.service.ChannelService;
+import com.chattime.chattime_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,21 +20,28 @@ public class ChannelController {
     @Autowired
     private ChannelService channelService;
 
+    @Autowired
+    private UserService userService;
+
     // implement create channel
     @PostMapping("")
     public BaseResponse<ChannelDataResponse> create(String key, String name) {
         Channel channel = channelService.create(key, name);
+        User user = userService.findByKey(channel.getKey());
         return new BaseResponse<>(true, new ChannelDataResponse(
                 channel.getId(),
                 channel.getKey(),
-                channel.getName()
+                channel.getName(),
+                channel.getStatus(),
+                user
         ));
     }
 
     // implement list of channels
     @GetMapping("")
     public BaseResponse<List<ChannelDataResponse>> list() {
-        List<Channel> channels = channelService.findAll();
+        List<Channel> channels = channelService.findAllActive();
+
         return new BaseResponse<>(true, ChannelDataResponse.fromList(channels));
     }
 }

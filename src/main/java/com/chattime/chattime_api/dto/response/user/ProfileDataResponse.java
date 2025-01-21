@@ -9,15 +9,21 @@ public class ProfileDataResponse {
     private Long id;
     private String username;
     private String email;
+    private String avatar;
+    private String key;
 
     public ProfileDataResponse(
         Long id,
         String username,
-        String email
+        String email,
+        String avatar,
+        String key
     ) {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.avatar = avatar;
+        this.key = key;
     }
 
     public Long getId() {
@@ -48,7 +54,25 @@ public class ProfileDataResponse {
         return users.stream().map(user -> new ProfileDataResponse(
             user.getId(),
             user.getUsername(),
-            user.getEmail()
+            user.getEmail(),
+            user.getAvatar(),
+            user.getKey()
         )).collect(Collectors.toList());
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
