@@ -1,6 +1,8 @@
 package com.chattime.chattime_api.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
@@ -10,27 +12,34 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "channel_id", referencedColumnName = "id")
-    private Channel channel;
+    @JoinColumn(name = "group_id", referencedColumnName = "id")
+    private Group group;
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     @Column(name = "created_at")
     private Date createdAt;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private Date updatedAt;
 
-    public Message(String content, User user, Channel channel) {
+    // Constructors
+    public Message() {
+    }
+
+    public Message(String content, User user, Group group) {
         this.content = content;
         this.createdBy = user;
-        this.channel = channel;
+        this.group = group;
     }
 
     // Getters and setters
@@ -40,14 +49,6 @@ public class Message {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getContent() {
@@ -70,15 +71,17 @@ public class Message {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
+    public Group getGroup() {
+        return group;
     }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+
 }

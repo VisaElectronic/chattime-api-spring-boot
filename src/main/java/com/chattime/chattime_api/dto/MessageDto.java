@@ -2,15 +2,13 @@ package com.chattime.chattime_api.dto;
 
 public class MessageDto {
     private String content;
-    private String channelId;
     private String type;
 
     public MessageDto() {
     }
 
-    public MessageDto(String content, String channelId, String type) {
+    public MessageDto(String content, String type) {
         this.content = content;
-        this.channelId = channelId;
         this.type = type;
     }
 
@@ -20,14 +18,6 @@ public class MessageDto {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
     }
 
     public String getType() {

@@ -1,3 +1,28 @@
+$(document).ready(function () {
+    $('#sign-in').click(function () {
+        $.ajax({
+            url: 'http://localhost:8080/login',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                email: $('#email_input').val(),
+                password: $('#password_input').val()
+            }),
+            success: function (res) {
+                console.log(res);
+                if(res.success && res.data) {
+                    console.log('Access Token: ' + res.data.accessToken);
+                    localStorage.setItem('accessToken', res.data.accessToken);
+                    window.location.href = 'chat.html';
+                }
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    });
+});
+
 const stompClient = new StompJs.Client({
   brokerURL: "ws://localhost:8080/ws",
 });

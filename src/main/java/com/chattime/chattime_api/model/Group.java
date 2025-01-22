@@ -6,31 +6,24 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "channels")
-public class Channel {
+@Table(name = "groups")
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     @Column(name = "key")
     private String key;
+    private String photo;
     private int status; // 1 for active, 0 for inactive
-
-    @OneToOne
-    @JoinColumn(name = "key", referencedColumnName = "key", insertable=false, updatable=false)
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private User createdBy;
 
     @ManyToMany
     @JoinTable(
             name = "groups_channels",
-            joinColumns = @JoinColumn(name = "channel_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id")
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "channel_id")
     )
-    private Set<Group> groups;
+    private Set<Channel> channels;
 
     @Column(name = "created_at")
     private Date createdAt;
@@ -39,12 +32,11 @@ public class Channel {
     private Date updatedAt;
 
     // Constructors
-    public Channel() {
+    public Group() {
     }
 
-    public Channel(String key, String name, int status) {
+    public Group(String key, int status) {
         this.key = key;
-        this.name = name;
         this.status = status;
     }
 
@@ -73,14 +65,6 @@ public class Channel {
         this.key = key;
     }
 
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -105,12 +89,11 @@ public class Channel {
         this.status = status;
     }
 
-    public User getUser() {
-        user.setPassword(null);
-        return user;
+    public String getPhoto() {
+        return photo;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }

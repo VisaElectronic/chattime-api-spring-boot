@@ -29,13 +29,13 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public List<Message> getMessagesByChannel(Channel channel) {
-        return new ArrayList<>(messageRepository.findByChannelId(channel.getId()));
-    }
-
     public User getUserFromSocketConnection(StompHeaderAccessor headerAccessor) {
         Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
         UserPrincipal user = (UserPrincipal) Objects.requireNonNull(sessionAttributes).get("user");
         return user.getUser();
+    }
+
+    public List<Message> getMessagesByGroup(Group group) {
+        return messageRepository.findAllByGroupId(group.getId());
     }
 }

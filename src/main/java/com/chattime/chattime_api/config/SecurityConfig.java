@@ -38,7 +38,13 @@ public class SecurityConfig {
                                 "/uploads/**",
                                 "/register",
                                 "/login",
-                                "/ws"
+                                "/ws",
+                                "/index.html",
+                                "/main.css",
+                                "/app.js",
+                                "/chat.html",
+                                "/chat.css",
+                                "/chat.js"
                         )
                         .permitAll()
                         .requestMatchers("/**").authenticated()
