@@ -56,4 +56,8 @@ public class UserService {
     public User findByKey(String key) {
         return userRepository.findByKey(key);
     }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 }

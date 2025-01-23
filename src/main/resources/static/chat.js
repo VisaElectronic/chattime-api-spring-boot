@@ -31,11 +31,11 @@ $(document).ready(function () {
     stompClient.activate();
 
     stompClient.onConnect = (frame) => {
-        console.log("Connected: " + frame);
         stompClient.subscribe("/channel/auth/" + KEY, (data) => {
             const result = JSON.parse(data.body);
-            console.log(result);
+            console.log('CONNECTED');
             USER = result.data;
+            $('#current_user').css('background-image', 'url(' + USER.avatar + ')');
             sendConnectMessage(result);
         });
         sendMessage("/app/channel/auth/" + KEY, {
@@ -59,24 +59,74 @@ $(document).ready(function () {
       if (!msgText) return;
 
       sendChatMessage(ON_GROUP, msgText);
-
-      // appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
-      // msgerInput.value = "";
-
-      // botResponse();
     });
 
     $(document).on('click', '.contact', function() {
       var key = $(this).data('key');
-      const contact = ONLINE_USERS.find(user => user.key === key);
+      const contact = ONLINE_USERS.find(group => group.key === key);
       ON_GROUP = contact;
       if (contact) {
-        $('#chat_to').text(contact.user.username);
-        console.log("Contact found:", contact);
+        $('#chat_to').text(contact.channels[0].user.username);
+        $('#chat_to_avatar').removeClass('d-none');
+        $('#chat_to_avatar').css('background-image', 'url(' + contact.channels[0].user.avatar + ')');
+        const connected = ONLINE_USERS.find(group => group.key === contact.key && group.connected);
+        if(connected) {
+          sendChatConnectMessage(contact, true);
+          return;
+        }
         $('.msger-chat').empty();
         sendChatConnectMessage(contact);
       } else {
         console.log("Contact not found");
+      }
+    });
+
+    $('.js-data-example-ajax').select2({
+      width: '100%',
+      dropdownParent: $('.modal'),
+      ajax: {
+        url: 'http://localhost:8080/api/user',
+        dataType: 'json',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        data: function (params) {
+          var query = {
+            search: params.term
+          }
+          return query;
+        },
+        processResults: function (data) {
+          return {
+            results: data.data.map(user => {
+              return {
+                id : user.id,
+                text: user.email
+              }
+            })
+          }
+        }
+      }
+    });
+
+    $('#add_user').click(function() {
+      const userId = $('[name="added_user"]').val();
+      if (userId) {
+        $.ajax({
+          url: 'http://localhost:8080/api/channels',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ userId: userId }),
+          headers: {
+            'Authorization': 'Bearer ' + accessToken
+          },
+          success: function(response) {
+            location.reload();
+          },
+          error: function(error) {
+            console.error('Error adding user to channel:', error);
+          }
+        });
       }
     });
 });
@@ -86,21 +136,27 @@ function sendMessage(topic, data) {
     destination: topic,
     body: JSON.stringify(data),
     callback: (message) => {
-      console.log(message);
+      console.log('message:', message);
     },
   });
 }
 
 function sendConnectMessage(result) {
-  stompClient.subscribe("/channel/online", (res) => {
+  stompClient.subscribe("/channel/" + result.data.key + "/online", (res) => {
     const data = JSON.parse(res.body).data;
-    console.log(data);
-    ONLINE_USERS = data;
+    // only add new connection to array , check if connection already exist 
+    data.forEach(newUser => {
+      const exists = ONLINE_USERS.some(user => user.key === newUser.key);
+      if (!exists) {
+        ONLINE_USERS.push(newUser);
+      }
+    });
     $('#contacts').empty();
     for (let i = 0; i < data.length; i++) {
-      const contact = data[i];
+      const group = data[i];
+      const contact = group.channels[0];
       const htmlContact = `
-        <div class="contact d-flex p-2" data-key="${contact.key}">
+        <div class="contact d-flex p-2" data-key="${group.key}">
           <div
                   class="msg-img"
                   style="background-image: url(${contact.user.avatar})"
@@ -114,31 +170,54 @@ function sendConnectMessage(result) {
       $('#contacts').append(htmlContact);
     }
   });
-  sendMessage("/app/channel/connect", {
+  sendMessage("/app/channel/" + result.data.key + "/connect", {
       'userId': result.data.id,
       'channelId': result.data.key,
   });
 }
 
-function sendChatConnectMessage(contact) {
+function sendChatConnectMessage(contact, isSubscribe = false) {
+  if(isSubscribe) {
+    sendMessage("/app/channel/" + contact.key + "/chat/connect", {
+      isGroup: contact.channels[0].user ? false : true,
+    });
+    return;
+  }
+  stompClient.unsubscribe("/channel/" + contact.key + "/chat/connect");
   stompClient.subscribe("/channel/" + contact.key + "/chat/connect", (res) => {
     const data = JSON.parse(res.body).data;
-    console.log('Chat connected: ', data);
+    if(data.length > 0 && data[0].group.key !== ON_GROUP.key) return;
     $('.msger-chat').empty();
     for (let i = 0; i < data.length; i++) {
       const msg = data[i];
       appendMessage(msg.user.username, msg.user.avatar, msg.user.id === USER.id ? 'right' : "left", msg.content, msg.createdAt);
     }
+    // check if user is connected to chat then don't subscribe again
+    const connected = ONLINE_USERS.find(group => group.key === contact.key && group.connected);
+    if(connected) return;
+    stompClient.unsubscribe("/channel/" + contact.key + "/chat");
     stompClient.subscribe("/channel/" + contact.key + "/chat", (res) => {
       const data = JSON.parse(res.body).data;
+      console.log('chat: ', data);
       const is_sender = USER.id === data.user.id;
-      appendMessage(USER.username, USER.avatar, is_sender ? 'right' : "left", data.content, data.createdAt);
+      appendMessage(data.user.username, data.user.avatar, is_sender ? 'right' : "left", data.content, data.createdAt);
+    });
+    // set connected to true
+    ONLINE_USERS.forEach(element => {
+      if(element.key == contact.key) element.connected = true;
     });
   });
-  sendMessage("/app/channel/" + contact.key + "/chat/connect", {});
+  sendMessage("/app/channel/" + contact.key + "/chat/connect", {
+    isGroup: contact.channels[0].user ? false : true,
+  });
+}
+
+function subscribeChatChannel(){
+
 }
 
 function sendChatMessage(contact, text) {
+  var channel = contact.channels[0];
   sendMessage("/app/channel/" + contact.key + "/chat", {
     'content': text,
     'type': 'TEXT',

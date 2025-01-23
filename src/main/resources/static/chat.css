@@ -25,15 +25,17 @@ body {
   height: 100vh;
   background-image: var(--body-bg);
   font-family: Helvetica, sans-serif;
+  flex-direction: column;
 }
 
 .contacts {
+  flex: 1;
   display: flex;
   flex-flow: column wrap;
   gap: 0.5rem;
   width: 15%;
   max-width: 867px;
-  margin: 25px 10px;
+  margin: 25px 0px;
   height: calc(100% - 50px);
   border: var(--border);
   border-radius: 5px;
@@ -42,11 +44,12 @@ body {
 }
 
 .msger {
+  flex: 3;
   display: flex;
   flex-flow: column wrap;
   justify-content: space-between;
-  width: 75%;
-  max-width: 867px;
+  /* width: 75%;
+  max-width: 867px; */
   margin: 25px 10px;
   height: calc(100% - 50px);
   border: var(--border);
@@ -166,10 +169,23 @@ body {
 }
 
 .contact {
-    background-color: #f1f1f1;
-    cursor: pointer;
+  background-color: #f1f1f1;
+  cursor: pointer;
 }
 
 .last-msg {
-    color: #d9d9d9;
+  color: #d9d9d9;
+}
+
+.svg-circleplus {
+  height: 50px;
+  stroke: black;
+}
+
+.add-user {
+  cursor: pointer;
+}
+
+.header {
+
 }

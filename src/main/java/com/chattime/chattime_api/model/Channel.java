@@ -1,5 +1,6 @@
 package com.chattime.chattime_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -30,6 +31,7 @@ public class Channel {
             joinColumns = @JoinColumn(name = "channel_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
+    @JsonIgnore
     private Set<Group> groups;
 
     @Column(name = "created_at")
@@ -42,10 +44,11 @@ public class Channel {
     public Channel() {
     }
 
-    public Channel(String key, String name, int status) {
+    public Channel(String key, String name, User createdBy, int status) {
         this.key = key;
         this.name = name;
         this.status = status;
+        this.createdBy = createdBy;
     }
 
     // Getters and setters

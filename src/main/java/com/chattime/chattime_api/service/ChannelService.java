@@ -1,6 +1,7 @@
 package com.chattime.chattime_api.service;
 
 import com.chattime.chattime_api.model.Channel;
+import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,13 @@ public class ChannelService {
         return channelRepository.findByKey(key);
     }
 
-    public Channel create(String key, String name) {
+    public Channel create(String key, String name, User user) {
         Channel channel = channelRepository.findByKey(key);
         if (channel != null) {
             channel.setName(name);
             channel.setStatus(1); // Assuming you want to set the status to active
         } else {
-            channel = new Channel(key, name, 1);
+            channel = new Channel(key, name, user, 1);
         }
         return channelRepository.save(channel);
     }

@@ -16,6 +16,7 @@ public class Group {
     private String key;
     private String photo;
     private int status; // 1 for active, 0 for inactive
+    private int isGroup;
 
     @ManyToMany
     @JoinTable(
@@ -95,5 +96,21 @@ public class Group {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public Set<Channel> getChannels() {
+        return channels;
+    }
+
+    public void setChannels(Set<Channel> channels) {
+        this.channels = channels;
+    }
+
+    public boolean isGroup() {
+        return isGroup == 1;
+    }
+
+    public void setGroup(int group) {
+        isGroup = group;
     }
 }
