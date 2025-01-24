@@ -13,7 +13,7 @@ public class MessageDto {
     }
 
     public String getContent() {
-        return content;
+        return content == null ? "" : content;
     }
 
     public void setContent(String content) {

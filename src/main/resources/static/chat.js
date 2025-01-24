@@ -1,9 +1,12 @@
+window.API_BASE_DOMAIN = '169.254.111.78:8080';
 window.stompClient = null;
 window.accessToken = null;
 window.USER = null
 window.KEY = uuidv4();
 window.ONLINE_USERS = [];
 window.ON_GROUP = null;
+window.GROUP_CONNECT = null;
+window.CHAT_CONNECT = null;
 
 const msgerForm = get(".msger-inputarea");
 const msgerInput = get(".msger-input");
@@ -26,7 +29,7 @@ const PERSON_NAME = "Sajad";
 $(document).ready(function () {
     window.accessToken = localStorage.getItem('accessToken');
     window.stompClient = new StompJs.Client({
-      brokerURL: "ws://localhost:8080/ws",
+      brokerURL: "ws://" + API_BASE_DOMAIN + "/ws",
     });
     stompClient.activate();
 
@@ -70,10 +73,10 @@ $(document).ready(function () {
         $('#chat_to_avatar').removeClass('d-none');
         $('#chat_to_avatar').css('background-image', 'url(' + contact.channels[0].user.avatar + ')');
         const connected = ONLINE_USERS.find(group => group.key === contact.key && group.connected);
-        if(connected) {
-          sendChatConnectMessage(contact, true);
-          return;
-        }
+        // if(connected) {
+        //   sendChatConnectMessage(contact, true);
+        //   return;
+        // }
         $('.msger-chat').empty();
         sendChatConnectMessage(contact);
       } else {
@@ -85,7 +88,7 @@ $(document).ready(function () {
       width: '100%',
       dropdownParent: $('.modal'),
       ajax: {
-        url: 'http://localhost:8080/api/user',
+        url: 'http://'+ API_BASE_DOMAIN +'/api/user',
         dataType: 'json',
         headers: {
           'Authorization': 'Bearer ' + accessToken
@@ -113,7 +116,7 @@ $(document).ready(function () {
       const userId = $('[name="added_user"]').val();
       if (userId) {
         $.ajax({
-          url: 'http://localhost:8080/api/channels',
+          url: 'http://'+API_BASE_DOMAIN+'/api/channels',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify({ userId: userId }),
@@ -177,14 +180,15 @@ function sendConnectMessage(result) {
 }
 
 function sendChatConnectMessage(contact, isSubscribe = false) {
-  if(isSubscribe) {
-    sendMessage("/app/channel/" + contact.key + "/chat/connect", {
-      isGroup: contact.channels[0].user ? false : true,
-    });
-    return;
-  }
-  stompClient.unsubscribe("/channel/" + contact.key + "/chat/connect");
-  stompClient.subscribe("/channel/" + contact.key + "/chat/connect", (res) => {
+  // if(isSubscribe) {
+  //   sendMessage("/app/channel/" + contact.key + "/chat/connect", {
+  //     isGroup: contact.channels[0].user ? false : true,
+  //   });
+  //   return;
+  // }
+  // stompClient.unsubscribe("/channel/" + contact.key + "/chat/connect");
+  if(GROUP_CONNECT) GROUP_CONNECT.unsubscribe();
+  GROUP_CONNECT = stompClient.subscribe("/channel/" + contact.key + "/chat/connect", (res) => {
     const data = JSON.parse(res.body).data;
     if(data.length > 0 && data[0].group.key !== ON_GROUP.key) return;
     $('.msger-chat').empty();
@@ -192,11 +196,11 @@ function sendChatConnectMessage(contact, isSubscribe = false) {
       const msg = data[i];
       appendMessage(msg.user.username, msg.user.avatar, msg.user.id === USER.id ? 'right' : "left", msg.content, msg.createdAt);
     }
-    // check if user is connected to chat then don't subscribe again
-    const connected = ONLINE_USERS.find(group => group.key === contact.key && group.connected);
-    if(connected) return;
-    stompClient.unsubscribe("/channel/" + contact.key + "/chat");
-    stompClient.subscribe("/channel/" + contact.key + "/chat", (res) => {
+    // // check if user is connected to chat then don't subscribe again
+    // const connected = ONLINE_USERS.find(group => group.key === contact.key && group.connected);
+    // if(connected) return;
+    if(CHAT_CONNECT) CHAT_CONNECT.unsubscribe();
+    CHAT_CONNECT = stompClient.subscribe("/channel/" + contact.key + "/chat", (res) => {
       const data = JSON.parse(res.body).data;
       console.log('chat: ', data);
       const is_sender = USER.id === data.user.id;

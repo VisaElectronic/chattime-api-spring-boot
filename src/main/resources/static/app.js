@@ -1,42 +1,48 @@
+window.API_BASE_DOMAIN = "169.254.111.78:8080";
+
 $(document).ready(function () {
-    $('#sign-in').click(function () {
-        $.ajax({
-            url: 'http://localhost:8080/login',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                email: $('#email_input').val(),
-                password: $('#password_input').val()
-            }),
-            success: function (res) {
-                console.log(res);
-                if(res.success && res.data) {
-                    console.log('Access Token: ' + res.data.accessToken);
-                    localStorage.setItem('accessToken', res.data.accessToken);
-                    window.location.href = 'chat.html';
-                }
-            },
-            error: function (data) {
-                console.log(data);
-            }
-        });
+  $("#sign-in").click(function () {
+    $.ajax({
+      url: "http://" + API_BASE_DOMAIN + "/login",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        email: $("#email_input").val(),
+        password: $("#password_input").val(),
+      }),
+      success: function (res) {
+        console.log(res);
+        if (res.success && res.data) {
+          console.log("Access Token: " + res.data.accessToken);
+          localStorage.setItem("accessToken", res.data.accessToken);
+          window.location.href = "chat.html";
+        }
+      },
+      error: function (data) {
+        console.log(data);
+      },
     });
+  });
 });
 
 const stompClient = new StompJs.Client({
-  brokerURL: "ws://localhost:8080/ws",
+  brokerURL: "ws://" + API_BASE_DOMAIN + "/ws",
 });
 
 stompClient.onConnect = (frame) => {
   setConnected(true);
   console.log("Connected: " + frame);
   // Custom headers to send along with the subscription
-    const headers = {
-      'Authorization': 'custom-value'
-    };
-  stompClient.subscribe("/channel/1234/subscribe", (greeting) => {
-    showGreeting(JSON.parse(greeting.body).content);
-  }, headers);
+  const headers = {
+    Authorization: "custom-value",
+  };
+  stompClient.subscribe(
+    "/channel/1234/subscribe",
+    (greeting) => {
+      showGreeting(JSON.parse(greeting.body).content);
+    },
+    headers
+  );
 };
 
 stompClient.onWebSocketError = (error) => {
@@ -73,7 +79,7 @@ function sendName() {
   stompClient.publish({
     destination: "/app/channel/1234/chat",
     body: JSON.stringify({
-        authToken: $("#token").val(),
+      authToken: $("#token").val(),
     }),
     callback: (message) => {
       console.log(message);

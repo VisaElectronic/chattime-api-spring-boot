@@ -112,23 +112,5 @@ public class MessageController {
         Group group = groupService.findByKey(group_id);
         List<Message> messages = messageService.getMessagesByGroup(group);
         return new BaseResponse<>(true, MessageDataResponse.fromList(messages));
-//        if(!connectDto.getIsGroup()) {
-//            Channel channel1 = channelService.findByKey(user.getKey());
-//            Channel channel2 = channelService.findByKey(group_id);
-//            List<Group> groups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey());
-//            if(groups.isEmpty()) {
-//                // generate random uuid for group key
-//                String key = UUID.randomUUID().toString();
-//                Group group = groupService.save(key);
-//                groupService.saveGroupChannels(group, Set.of(channel1, channel2));
-//                List<Message> messages = messageService.getMessagesByGroup(group);
-//                return new BaseResponse<>(true, MessageDataResponse.fromList(messages));
-//            } else {
-//                Group group = groups.getFirst();
-//                List<Message> messages = messageService.getMessagesByGroup(group);
-//                return new BaseResponse<>(true, MessageDataResponse.fromList(messages));
-//            }
-//        }
-//        return new BaseResponse<>(true, null);
     }
 }
