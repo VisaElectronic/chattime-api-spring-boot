@@ -6,6 +6,7 @@ import com.chattime.chattime_api.dto.response.login.LoginDataResponse;
 import com.chattime.chattime_api.dto.response.login.LoginResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
 import com.chattime.chattime_api.model.User;
+import com.chattime.chattime_api.model.UserPrincipal;
 import com.chattime.chattime_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,9 @@ public class UserController {
     // implement list of users with pagination
     @GetMapping("")
     public BaseResponse<List<ProfileDataResponse>> list() {
-        List<User> users = userService.findAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = ((UserPrincipal) authentication.getPrincipal()).getUser();
+        List<User> users = userService.findAllAndRemoveCurrentUser(user);
         return new BaseResponse<>(true, ProfileDataResponse.fromList(users));
     }
 

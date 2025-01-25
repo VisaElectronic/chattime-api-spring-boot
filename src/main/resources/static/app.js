@@ -1,7 +1,8 @@
-window.API_BASE_DOMAIN = "169.254.111.78:8080";
+window.API_BASE_DOMAIN = "169.254.233.229:8080";
 
 $(document).ready(function () {
   $("#sign-in").click(function () {
+    $('.loading-overlay').toggleClass('is-active');
     $.ajax({
       url: "http://" + API_BASE_DOMAIN + "/login",
       type: "POST",

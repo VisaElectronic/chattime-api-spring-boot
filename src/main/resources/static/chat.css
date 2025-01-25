@@ -178,14 +178,24 @@ body {
 }
 
 .svg-circleplus {
-  height: 50px;
+  height: 30px;
   stroke: black;
 }
 
 .add-user {
   cursor: pointer;
+  border-radius: 1rem;
+  padding: 5px;
 }
 
-.header {
+.add-user:hover {
+  background: #dedede;
+}
 
+.select2-result-user__avatar img {
+  width: 3rem;
+}
+
+#current_user {
+  cursor: pointer;
 }

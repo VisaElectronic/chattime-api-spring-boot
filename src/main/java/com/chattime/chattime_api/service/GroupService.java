@@ -52,8 +52,8 @@ public class GroupService {
         return groupRepository.findGroupsContainingKeys(Arrays.asList(key1, key2), 2);
     }
 
-    public List<Group> findAllByUserKey(String key, User user) {
-        List<Group> groups = groupRepository.findByChannelsKey(key);
+    public List<Group> findAllByUserKey(String userChannelKey, User user) {
+        List<Group> groups = groupRepository.findByChannelsKey(userChannelKey);
         for (Group group : groups) {
             if(!group.isGroup()) {
                 List<Channel> channels = channelRepository.findByGroupsIdAndNotKey(group.getId(), user.getKey());

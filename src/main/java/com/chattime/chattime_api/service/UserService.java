@@ -53,6 +53,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public List<User> findAllAndRemoveCurrentUser(User user) {
+        List<User> users = userRepository.findAll();
+        users.remove(user);
+        return users;
+    }
+
     public User findByKey(String key) {
         return userRepository.findByKey(key);
     }
