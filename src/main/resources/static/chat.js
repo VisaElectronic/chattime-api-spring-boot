@@ -1,4 +1,4 @@
-window.API_BASE_DOMAIN = "169.254.233.229:8080";
+window.API_BASE_DOMAIN = "172.20.10.2:8080";
 window.stompClient = null;
 window.accessToken = null;
 window.USER = null;

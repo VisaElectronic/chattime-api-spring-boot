@@ -44,9 +44,9 @@ public class ContactController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
         User user = userService.findById(addUserDto.getUserId());
-        Channel channel1 = channelService.create(user.getKey(), null, user);
+        Channel channel1 = channelService.create(user.getKey(), user.getUsername(), user);
         channel1.setUser(user);
-        Channel channel2 = channelService.create(currentUser.getKey(), null, currentUser);
+        Channel channel2 = channelService.create(currentUser.getKey(), currentUser.getUsername(), currentUser);
         List<Group> existingGroups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey());
         if (!existingGroups.isEmpty()) {
             return new BaseResponse<>(true, new GroupDataResponse(
