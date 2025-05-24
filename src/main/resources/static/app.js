@@ -1,4 +1,4 @@
-window.API_BASE_DOMAIN = "172.20.10.2:8080";
+window.API_BASE_DOMAIN = "192.168.5.185:8080";
 
 $(document).ready(function () {
   $("#sign-in").click(function () {
