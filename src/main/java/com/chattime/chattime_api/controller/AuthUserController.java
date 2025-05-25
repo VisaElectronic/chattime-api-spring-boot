@@ -56,9 +56,9 @@ public class AuthUserController {
         UserDto userDto = new UserDto(username, email, password, avatarPath);
         User user = userService.register(userDto);
         return new RegisterResponse(true, new RegisterDataResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail())
+            user.getId(),
+            user.getUsername(),
+            user.getEmail())
         );
     }
 
