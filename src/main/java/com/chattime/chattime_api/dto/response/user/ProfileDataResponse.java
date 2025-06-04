@@ -1,10 +1,14 @@
 package com.chattime.chattime_api.dto.response.user;
 
 import com.chattime.chattime_api.model.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Setter
+@Getter
 public class ProfileDataResponse {
     private Long id;
     private String username;
@@ -26,30 +30,6 @@ public class ProfileDataResponse {
         this.key = key;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public static List<ProfileDataResponse> fromList(List<User> users) {
         return users.stream().map(user -> new ProfileDataResponse(
             user.getId(),
@@ -60,19 +40,4 @@ public class ProfileDataResponse {
         )).collect(Collectors.toList());
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
 }

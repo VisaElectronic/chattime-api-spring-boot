@@ -4,10 +4,14 @@ import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.model.Group;
 import com.chattime.chattime_api.model.Message;
 import com.chattime.chattime_api.model.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
 
+@Setter
+@Getter
 public class MessageDataResponse {
     private Long id;
     private String content;
@@ -23,7 +27,12 @@ public class MessageDataResponse {
         this.content = content;
         this.group = new GroupDataResponse(
                 group.getId(),
+                group.getName(),
+                group.getPhoto(),
                 group.getKey(),
+                group.getStatus(),
+                group.isGroup(),
+                null,
                 null
         );
         this.user = user;
@@ -40,43 +49,4 @@ public class MessageDataResponse {
         )).toList();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public GroupDataResponse getGroup() {
-        return group;
-    }
-
-    public void setGroup(GroupDataResponse group) {
-        this.group = group;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

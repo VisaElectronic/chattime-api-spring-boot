@@ -1,13 +1,11 @@
 package com.chattime.chattime_api.config;
 import com.chattime.chattime_api.dto.SocketToken;
-import com.chattime.chattime_api.interceptor.AuthWSInterceptor;
-import com.chattime.chattime_api.model.UserPrincipal;
 import com.chattime.chattime_api.service.AuthUserDetailsService;
 import com.chattime.chattime_api.service.JWTService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -16,17 +14,12 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authorization.AuthorizationManager;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-
-import java.security.Principal;
 import java.util.Map;
 
 @Configuration
@@ -64,13 +57,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     byte[] payload = (byte[]) message.getPayload();
                     String jsonToken = new String(payload);
                     SocketToken wsToken;
+                    String username = null;
                     try {
                         ObjectMapper objectMapper = new ObjectMapper();
                         wsToken = objectMapper.readValue(jsonToken, SocketToken.class);
+                        username = jwtService.extractUserName(wsToken.getAuthToken());
                     } catch (JsonProcessingException e) {
                         return null;
+                    } catch (ExpiredJwtException e) {
+                        accessor.setMessage("Token expired");
+                        accessor.setMessageId("token_expired");
+                        return message;
                     }
-                    String username = jwtService.extractUserName(wsToken.getAuthToken());
                     if (username != null) {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                         sessionAttributes.put("user", userDetails);

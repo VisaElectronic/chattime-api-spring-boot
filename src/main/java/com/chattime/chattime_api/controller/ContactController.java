@@ -3,7 +3,6 @@ package com.chattime.chattime_api.controller;
 import com.chattime.chattime_api.dto.AddContactDto;
 import com.chattime.chattime_api.dto.AddUserDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
-import com.chattime.chattime_api.dto.response.channel.ChannelDataResponse;
 import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.model.Channel;
 import com.chattime.chattime_api.model.Group;
@@ -44,14 +43,23 @@ public class ContactController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
         User user = userService.findById(addUserDto.getUserId());
+        if(Objects.equals(currentUser.getEmail(), user.getEmail())) {
+            throw new IllegalArgumentException("You can't add yourself as a contact");
+        }
         Channel channel1 = channelService.create(user.getKey(), user.getUsername(), user);
         channel1.setUser(user);
         Channel channel2 = channelService.create(currentUser.getKey(), currentUser.getUsername(), currentUser);
         List<Group> existingGroups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey());
         if (!existingGroups.isEmpty()) {
+            Group firstGroup = existingGroups.getFirst();
             return new BaseResponse<>(true, new GroupDataResponse(
-                    existingGroups.getFirst().getId(),
-                    existingGroups.getFirst().getKey(),
+                    firstGroup.getId(),
+                    firstGroup.getName(),
+                    firstGroup.getPhoto(),
+                    firstGroup.getKey(),
+                    firstGroup.getStatus(),
+                    firstGroup.isGroup(),
+                    channel1,
                     List.of(channel1, channel2)
             ));
         }
@@ -60,7 +68,12 @@ public class ContactController {
         groupService.saveGroupChannels(group, Set.of(channel1, channel2));
         return new BaseResponse<>(true, new GroupDataResponse(
                 group.getId(),
+                group.getName(),
+                group.getPhoto(),
                 group.getKey(),
+                group.getStatus(),
+                group.isGroup(),
+                channel1,
                 List.of(channel1, channel2)
         ));
     }
@@ -73,7 +86,7 @@ public class ContactController {
         Channel channel = channelService.findByKey(currentUser.getKey());
         List<Group> groups = groupService.findAllByUserKey(channel.getKey(), currentUser);
 
-        return new BaseResponse<>(true, GroupDataResponse.fromList(groups));
+        return new BaseResponse<>(true, GroupDataResponse.fromList(groups, currentUser));
     }
 
     @PostMapping("add")
@@ -89,9 +102,15 @@ public class ContactController {
         Channel channel2 = channelService.create(currentUser.getKey(), currentUser.getUsername(), currentUser);
         List<Group> existingGroups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey());
         if (!existingGroups.isEmpty()) {
+            Group firstGroup = existingGroups.getFirst();
             return new BaseResponse<>(true, new GroupDataResponse(
-                    existingGroups.getFirst().getId(),
-                    existingGroups.getFirst().getKey(),
+                    firstGroup.getId(),
+                    firstGroup.getName(),
+                    firstGroup.getPhoto(),
+                    firstGroup.getKey(),
+                    firstGroup.getStatus(),
+                    firstGroup.isGroup(),
+                    channel1,
                     List.of(channel1, channel2)
             ));
         }
@@ -103,13 +122,18 @@ public class ContactController {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
                 List<Group> groups1 = groupService.findAllByUserKey(channel.getKey(), channel.getUser());
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
-                    new BaseResponse<>(true, GroupDataResponse.fromList(groups1))
+                    new BaseResponse<>(true, GroupDataResponse.fromList(groups1, currentUser))
                 );
             }
         }
         return new BaseResponse<>(true, new GroupDataResponse(
                 group.getId(),
+                group.getName(),
+                group.getPhoto(),
                 group.getKey(),
+                group.getStatus(),
+                group.isGroup(),
+                channel1,
                 List.of(channel1, channel2)
         ));
     }

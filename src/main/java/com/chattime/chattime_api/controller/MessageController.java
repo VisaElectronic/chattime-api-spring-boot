@@ -1,13 +1,10 @@
 package com.chattime.chattime_api.controller;
 
 import com.chattime.chattime_api.dto.MessageDto;
-import com.chattime.chattime_api.dto.SocketToken;
 import com.chattime.chattime_api.dto.response.BaseResponse;
-import com.chattime.chattime_api.dto.response.channel.ChannelDataResponse;
 import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.dto.response.message.MessageDataResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
-import com.chattime.chattime_api.dto.socket.AuthDto;
 import com.chattime.chattime_api.dto.socket.ConnectChatDto;
 import com.chattime.chattime_api.dto.socket.ConnectOnlineDto;
 import com.chattime.chattime_api.model.*;
@@ -25,8 +22,6 @@ import com.chattime.chattime_api.service.MessageService;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
 
 @Controller
 public class MessageController {
@@ -58,7 +53,7 @@ public class MessageController {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
                 List<Group> groups = groupService.findAllByUserKey(channel.getKey(), channel.getUser());
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
-                    new BaseResponse<>(true, GroupDataResponse.fromList(groups))
+                    new BaseResponse<>(true, GroupDataResponse.fromList(groups, user))
                 );
             }
         }
@@ -74,10 +69,13 @@ public class MessageController {
 
     @MessageMapping("/channel/auth/{id}")
     @SendTo("/channel/auth/{id}")
-    public BaseResponse<ProfileDataResponse> authUserSocket(
+    public Object authUserSocket(
             @DestinationVariable String id,
             StompHeaderAccessor headerAccessor
     ) {
+        if(Objects.equals(headerAccessor.getMessageId(), "token_expired")) {
+            return new BaseResponse<>(false, "token_expired");
+        }
         User user = messageService.getUserFromSocketConnection(headerAccessor);
         return new BaseResponse<>(true, new ProfileDataResponse(
                 user.getId(),
@@ -98,7 +96,7 @@ public class MessageController {
         User user = messageService.getUserFromSocketConnection(headerAccessor);
         channelService.create(user_key, user.getUsername(), user);
         List<Group> groups = groupService.findAllByUserKey(user.getKey(), user);
-        return new BaseResponse<>(true, GroupDataResponse.fromList(groups));
+        return new BaseResponse<>(true, GroupDataResponse.fromList(groups, user));
     }
 
     @MessageMapping("/channel/{group_id}/chat/connect")

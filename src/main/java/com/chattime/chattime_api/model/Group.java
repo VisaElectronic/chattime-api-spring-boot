@@ -1,6 +1,8 @@
 package com.chattime.chattime_api.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.Set;
@@ -15,7 +17,11 @@ public class Group {
     @Column(name = "key")
     private String key;
     private String photo;
+    @Getter
+    @Setter
+    @Column(name = "status")
     private int status; // 1 for active, 0 for inactive
+    @Column(name = "is_group")
     private int isGroup;
 
     @ManyToMany
@@ -36,7 +42,10 @@ public class Group {
     public Group() {
     }
 
-    public Group(String key, int status) {
+    public Group(
+            String key,
+            int status
+    ) {
         this.key = key;
         this.status = status;
     }
@@ -80,14 +89,6 @@ public class Group {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
     }
 
     public String getPhoto() {

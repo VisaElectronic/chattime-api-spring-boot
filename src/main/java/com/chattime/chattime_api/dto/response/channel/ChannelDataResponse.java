@@ -3,11 +3,15 @@ package com.chattime.chattime_api.dto.response.channel;
 import com.chattime.chattime_api.model.Channel;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.service.UserService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class ChannelDataResponse {
     private Long id;
     private String key;
@@ -33,30 +37,6 @@ public class ChannelDataResponse {
         this.user = user;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public static List<ChannelDataResponse> fromList(List<Channel> channels) {
         return channels.stream().map(channel -> new ChannelDataResponse(
             channel.getId(),
@@ -65,29 +45,5 @@ public class ChannelDataResponse {
             channel.getStatus(),
             channel.getUser()
         )).collect(Collectors.toList());
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public boolean isGroup() {
-        return isGroup;
-    }
-
-    public void setGroup(boolean group) {
-        isGroup = group;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }
