@@ -44,7 +44,12 @@ public class UserController {
                 user.getUsername(),
                 user.getEmail(),
                 user.getAvatar(),
-                user.getKey()
+                user.getKey(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getPhone(),
+                user.getDob(),
+                user.getBio()
         ));
     }
 }
