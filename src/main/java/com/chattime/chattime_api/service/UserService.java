@@ -28,9 +28,11 @@ public class UserService {
     public User register(UserDto userDto) {
         User user = new User(
             userDto.getUsername(),
+            userDto.getFirstname(),
+            userDto.getLastname(),
             userDto.getEmail(),
-            encoder.encode(userDto.getPassword()),
-            userDto.getAvatar()
+            userDto.getPhone(),
+            encoder.encode(userDto.getPassword())
         );
         return userRepository.save(user);
     }

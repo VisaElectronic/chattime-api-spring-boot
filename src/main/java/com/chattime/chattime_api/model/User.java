@@ -35,11 +35,20 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String password, String avatar) {
+    public User(
+            String username,
+            String firstname,
+            String lastname,
+            String email,
+            String phone,
+            String password
+    ) {
         this.username = username;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.phone = phone;
         this.password = password;
         this.email = email;
-        this.avatar = avatar;
         this.key = java.util.UUID.randomUUID().toString();
     }
 }

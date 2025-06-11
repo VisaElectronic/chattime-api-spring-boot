@@ -36,24 +36,13 @@ public class AuthUserController {
 
     @PostMapping("/register")
     public RegisterResponse register(
-        @RequestParam("username") String username,
+        @RequestParam("firstname") String firstname,
+        @RequestParam("lastname") String lastname,
         @RequestParam("email") String email,
-        @RequestParam("password") String password,
-        @RequestPart("files") List<MultipartFile> files
+        @RequestParam("phone") String phone,
+        @RequestParam("password") String password
     ) {
-        final List<Path> filePath = new ArrayList<>(List.of());
-        if (files != null) {
-            files.forEach(file -> {
-                try {
-                    filePath.add(utilService.saveFile(file));
-                } catch (IOException e) {
-                    throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
-                }
-            });
-        }
-        String[] parts = !filePath.isEmpty() ? filePath.getFirst().toString().split("/") : new String[0];
-        String avatarPath = parts.length > 4 ? String.join("/", Arrays.copyOfRange(parts, 4, parts.length)) : null;
-        UserDto userDto = new UserDto(username, email, password, avatarPath);
+        UserDto userDto = new UserDto(firstname.toLowerCase(), firstname, lastname, email, phone, password);
         User user = userService.register(userDto);
         return new RegisterResponse(true, new RegisterDataResponse(
             user.getId(),
