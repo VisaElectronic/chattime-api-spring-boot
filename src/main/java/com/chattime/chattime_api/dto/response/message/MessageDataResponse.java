@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -16,13 +17,21 @@ public class MessageDataResponse {
     private Long id;
     private String content;
     private Date createdAt;
+    private Boolean ofCurrentUser;
     private GroupDataResponse group;
     private User user;
 
     public MessageDataResponse() {
     }
 
-    public MessageDataResponse(Long id, String content, Group group, User user, Date createdAt) {
+    public MessageDataResponse(
+            Long id,
+            String content,
+            Group group,
+            User user,
+            Date createdAt,
+            Boolean ofCurrentUser
+    ) {
         this.id = id;
         this.content = content;
         this.group = new GroupDataResponse(
@@ -37,16 +46,22 @@ public class MessageDataResponse {
         );
         this.user = user;
         this.createdAt = createdAt;
+        this.ofCurrentUser = ofCurrentUser;
     }
 
-    public static List<MessageDataResponse> fromList(List<Message> messages) {
-        return messages.stream().map(message -> new MessageDataResponse(
-                message.getId(),
-                message.getContent(),
-                message.getGroup(),
-                message.getCreatedBy(),
-                message.getCreatedAt()
-        )).toList();
+    public static List<MessageDataResponse> fromList(List<Message> messages, User currentLoginUser) {
+        return messages.stream().map(message -> {
+            User sender = message.getCreatedBy();
+            Boolean ofCurrentUser = Objects.equals(sender.getId(), currentLoginUser.getId());
+            return new MessageDataResponse(
+                    message.getId(),
+                    message.getContent(),
+                    message.getGroup(),
+                    sender,
+                    message.getCreatedAt(),
+                    ofCurrentUser
+            );
+        }).toList();
     }
 
 }

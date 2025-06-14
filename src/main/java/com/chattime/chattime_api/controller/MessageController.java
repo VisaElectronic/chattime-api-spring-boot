@@ -51,7 +51,7 @@ public class MessageController {
 
         for (Channel channel : group.getChannels()) {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
-                List<Group> groups = groupService.findAllByUserKey(channel.getKey(), channel.getUser());
+                List<Group> groups = groupService.findAllByUserKey(channel.getKey(), user);
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
                     new BaseResponse<>(true, GroupDataResponse.fromList(groups, user))
                 );
@@ -63,7 +63,8 @@ public class MessageController {
                 message.getContent(),
                 group,
                 user,
-                message.getCreatedAt()
+                message.getCreatedAt(),
+                true
         ));
     }
 
@@ -114,6 +115,6 @@ public class MessageController {
         User user = messageService.getUserFromSocketConnection(headerAccessor);
         Group group = groupService.findByKey(group_id);
         List<Message> messages = messageService.getMessagesByGroup(group);
-        return new BaseResponse<>(true, MessageDataResponse.fromList(messages));
+        return new BaseResponse<>(true, MessageDataResponse.fromList(messages, user));
     }
 }
