@@ -70,4 +70,8 @@ public class GroupService {
         }
         return null;
     }
+
+    public List<Group> searchGroups(Long userId, String searchText) {
+        return groupRepository.findByUserAndSearchText(userId, searchText.trim());
+    }
 }

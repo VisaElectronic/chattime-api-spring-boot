@@ -1,5 +1,7 @@
 package com.chattime.chattime_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +21,7 @@ public class User {
     private String username;
     private String key;
     private String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String avatar;
     private String firstname;
@@ -27,8 +30,10 @@ public class User {
     private String dob;
     private String bio;
     @Column(name = "created_at")
+    @JsonIgnore
     private Date createdAt;
     @Column(name = "updated_at")
+    @JsonIgnore
     private Date updatedAt;
 
     public User() {
