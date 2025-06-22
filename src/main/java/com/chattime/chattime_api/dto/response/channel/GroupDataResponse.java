@@ -16,6 +16,8 @@ import java.util.Set;
 public class GroupDataResponse {
     private Long id;
     private String name;
+    private String customFirstname;
+    private String customLastname;
     private String photo;
     private String key;
     private int status;
@@ -26,6 +28,8 @@ public class GroupDataResponse {
     public GroupDataResponse(
             Long id,
             String name,
+            String customFirstname,
+            String customLastname,
             String photo,
             String key,
             int status,
@@ -35,6 +39,8 @@ public class GroupDataResponse {
     ) {
         this.id = id;
         this.name = name;
+        this.customFirstname = customFirstname;
+        this.customLastname = customLastname;
         this.photo = photo;
         this.key = key;
         this.status = status;
@@ -55,6 +61,8 @@ public class GroupDataResponse {
             return new GroupDataResponse(
                     group.getId(),
                     group.getName(),
+                    group.getCustomFirstname(),
+                    group.getCustomLastname(),
                     group.getPhoto(),
                     group.getKey(),
                     group.getStatus(),

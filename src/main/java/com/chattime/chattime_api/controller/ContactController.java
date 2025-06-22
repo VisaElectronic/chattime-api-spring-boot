@@ -1,6 +1,6 @@
 package com.chattime.chattime_api.controller;
 
-import com.chattime.chattime_api.dto.AddUserDto;
+import com.chattime.chattime_api.dto.request.AddContactDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.dto.response.channel.ChannelSearchData;
@@ -12,11 +12,12 @@ import com.chattime.chattime_api.service.ChannelService;
 import com.chattime.chattime_api.service.GroupService;
 import com.chattime.chattime_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,10 +41,13 @@ public class ContactController {
 
     // implement create channel
     @PostMapping("")
-    public BaseResponse<GroupDataResponse> create(@RequestBody AddUserDto addUserDto) {
+    public BaseResponse<Object> create(@RequestBody AddContactDto addContactDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
-        User user = userService.findById(addUserDto.getUserId());
+        User user = userService.findByPhone(addContactDto.getPhoneNumber());
+        if(user == null) {
+            return new BaseResponse<>(false, "The person with this phone number is not registered on Telegram yet.");
+        }
         if(Objects.equals(currentUser.getEmail(), user.getEmail())) {
             throw new IllegalArgumentException("You can't add yourself as a contact");
         }
@@ -56,6 +60,8 @@ public class ContactController {
             return new BaseResponse<>(true, new GroupDataResponse(
                     firstGroup.getId(),
                     firstGroup.getName(),
+                    firstGroup.getCustomFirstname(),
+                    firstGroup.getCustomLastname(),
                     firstGroup.getPhoto(),
                     firstGroup.getKey(),
                     firstGroup.getStatus(),
@@ -65,11 +71,13 @@ public class ContactController {
             ));
         }
         String key = UUID.randomUUID().toString();
-        Group group = groupService.save(key);
+        Group group = groupService.save(key, addContactDto.getFirstName(), addContactDto.getLastName());
         groupService.saveGroupChannels(group, Set.of(channel1, channel2));
         return new BaseResponse<>(true, new GroupDataResponse(
                 group.getId(),
                 group.getName(),
+                group.getCustomFirstname(),
+                group.getCustomLastname(),
                 group.getPhoto(),
                 group.getKey(),
                 group.getStatus(),

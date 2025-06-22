@@ -7,6 +7,8 @@ import lombok.Setter;
 import java.util.Date;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "groups")
 public class Group {
@@ -14,11 +16,13 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Column(name = "custom_firstname")
+    private String customFirstname;
+    @Column(name = "custom_lastname")
+    private String customLastname;
     @Column(name = "key")
     private String key;
     private String photo;
-    @Getter
-    @Setter
     @Column(name = "status")
     private int status; // 1 for active, 0 for inactive
     @Column(name = "is_group")
@@ -44,67 +48,14 @@ public class Group {
 
     public Group(
             String key,
+            String customFirstname,
+            String customLastname,
             int status
     ) {
         this.key = key;
+        this.customFirstname = customFirstname;
+        this.customLastname = customLastname;
         this.status = status;
-    }
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public Set<Channel> getChannels() {
-        return channels;
-    }
-
-    public void setChannels(Set<Channel> channels) {
-        this.channels = channels;
     }
 
     public boolean isGroup() {

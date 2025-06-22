@@ -37,6 +37,8 @@ public class MessageDataResponse {
         this.group = new GroupDataResponse(
                 group.getId(),
                 group.getName(),
+                group.getCustomFirstname(),
+                group.getCustomLastname(),
                 group.getPhoto(),
                 group.getKey(),
                 group.getStatus(),

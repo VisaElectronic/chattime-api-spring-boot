@@ -26,12 +26,16 @@ public class GroupService {
         return groupRepository.findByKey(key);
     }
 
-    public Group save(String key) {
+    public Group save(
+            String key,
+            String customFirstname,
+            String customLastname
+    ) {
         Group group = groupRepository.findByKey(key);
         if(group != null) {
             group.setStatus(1);
         } else {
-            group = new Group(key, 1);
+            group = new Group(key, customFirstname, customLastname, 1);
         }
         return groupRepository.save(group);
     }
