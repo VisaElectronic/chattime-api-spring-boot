@@ -36,4 +36,8 @@ public class ChannelService {
     public List<Channel> findAllActive() {
         return channelRepository.findAllByStatus(1);
     }
+
+    public List<Channel> findAllByKeyIn(List<String> keys) {
+        return channelRepository.findAllByKeyIn(keys);
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -21,4 +22,6 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
 
     @Query("SELECT c FROM Channel c JOIN c.groups g ON g.id = :id WHERE c.key != :key")
     List<Channel> findByGroupsIdAndNotKey(@Param("id") Long id, @Param("key") String key);
+
+    List<Channel> findAllByKeyIn(Collection<String> keys);
 }

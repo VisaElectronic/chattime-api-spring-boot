@@ -17,7 +17,7 @@ public class MessageDataResponse {
     private Long id;
     private String content;
     private Date createdAt;
-    private Boolean ofCurrentUser;
+    private User newClient;
     private GroupDataResponse group;
     private User user;
 
@@ -30,7 +30,7 @@ public class MessageDataResponse {
             Group group,
             User user,
             Date createdAt,
-            Boolean ofCurrentUser
+            User newClient
     ) {
         this.id = id;
         this.content = content;
@@ -48,20 +48,19 @@ public class MessageDataResponse {
         );
         this.user = user;
         this.createdAt = createdAt;
-        this.ofCurrentUser = ofCurrentUser;
+        this.newClient = newClient;
     }
 
     public static List<MessageDataResponse> fromList(List<Message> messages, User currentLoginUser) {
         return messages.stream().map(message -> {
             User sender = message.getCreatedBy();
-            Boolean ofCurrentUser = Objects.equals(sender.getId(), currentLoginUser.getId());
             return new MessageDataResponse(
                     message.getId(),
                     message.getContent(),
                     message.getGroup(),
                     sender,
                     message.getCreatedAt(),
-                    ofCurrentUser
+                    currentLoginUser
             );
         }).toList();
     }

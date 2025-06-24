@@ -12,15 +12,18 @@ import java.util.*;
 @Setter
 public class ChannelSearchData {
     Long   id;
+    String key;
     String name;
     User user;
 
     public ChannelSearchData(
             Long id,
+            String key,
             String name,
             User user
     ) {
         this.id = id;
+        this.key = key;
         this.name = name;
         this.user = user;
     }
@@ -28,6 +31,7 @@ public class ChannelSearchData {
     public static ChannelSearchData from(Channel c) {
         return new ChannelSearchData(
                 c.getId(),
+                c.getKey(),
                 c.getName(),
                 c.getCreatedBy()
         );

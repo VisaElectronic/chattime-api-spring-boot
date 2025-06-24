@@ -28,14 +28,25 @@ public class GroupService {
 
     public Group save(
             String key,
+            String fullName,
             String customFirstname,
-            String customLastname
+            String customLastname,
+            String profile,
+            boolean isGroup
     ) {
         Group group = groupRepository.findByKey(key);
         if(group != null) {
             group.setStatus(1);
         } else {
-            group = new Group(key, customFirstname, customLastname, 1);
+            group = new Group(
+                key,
+                fullName,
+                customFirstname,
+                customLastname,
+                profile,
+                isGroup ? 1 : 0,
+                1
+            );
         }
         return groupRepository.save(group);
     }
@@ -47,7 +58,7 @@ public class GroupService {
         groupRepository.save(group);
     }
 
-    public void saveGroupChannels(Group group, Set<Channel> channels) {
+    public void saveGroupChannels(Group group, List<Channel> channels) {
         group.setChannels(new HashSet<>(channels));
         groupRepository.save(group);
     }
@@ -59,10 +70,8 @@ public class GroupService {
     public List<Group> findAllByUserKey(String userChannelKey, User user) {
         List<Group> groups = groupRepository.findByChannelsKey(userChannelKey);
         for (Group group : groups) {
-            if(!group.isGroup()) {
-                List<Channel> channels = channelRepository.findByGroupsIdAndNotKey(group.getId(), user.getKey());
-                group.setChannels(new HashSet<>(channels));
-            }
+            List<Channel> channels = channelRepository.findByGroupsIdAndNotKey(group.getId(), user.getKey());
+            group.setChannels(new HashSet<>(channels));
         }
         return groups;
     }

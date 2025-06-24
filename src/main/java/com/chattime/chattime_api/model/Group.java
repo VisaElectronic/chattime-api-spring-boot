@@ -48,13 +48,19 @@ public class Group {
 
     public Group(
             String key,
+            String fullName,
             String customFirstname,
             String customLastname,
+            String profile,
+            int isGroup,
             int status
     ) {
         this.key = key;
+        this.name = fullName;
         this.customFirstname = customFirstname;
         this.customLastname = customLastname;
+        this.photo = profile;
+        this.isGroup = isGroup;
         this.status = status;
     }
 

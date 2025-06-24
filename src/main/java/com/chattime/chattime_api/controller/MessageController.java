@@ -52,6 +52,7 @@ public class MessageController {
         for (Channel channel : group.getChannels()) {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
                 List<Group> groups = groupService.findAllByUserKey(channel.getKey(), user);
+                /* Send To Online Channel For Loading The Channel To Left Side-Bar */
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
                     new BaseResponse<>(true, GroupDataResponse.fromList(groups, user))
                 );
@@ -64,7 +65,7 @@ public class MessageController {
                 group,
                 user,
                 message.getCreatedAt(),
-                true
+                user
         ));
     }
 

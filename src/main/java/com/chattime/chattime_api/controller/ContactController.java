@@ -1,6 +1,7 @@
 package com.chattime.chattime_api.controller;
 
 import com.chattime.chattime_api.dto.request.AddContactDto;
+import com.chattime.chattime_api.dto.request.AddGroupDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.dto.response.channel.ChannelSearchData;
@@ -19,10 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/contacts")
@@ -38,6 +36,35 @@ public class ContactController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @PostMapping("/group")
+    public BaseResponse<Object> createGroup(@RequestBody AddGroupDto addGroupDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
+        // add current user channel key to body
+        addGroupDto.addChannelKey(currentUser.getKey());
+        List<Channel> channels = channelService.findAllByKeyIn(addGroupDto.getChannelKeys());
+        String key = UUID.randomUUID().toString();
+        Group group = groupService.save(
+            key,
+            addGroupDto.getTitle(),null, null,
+            addGroupDto.getProfile(),
+                true
+        );
+        groupService.saveGroupChannels(group, channels);
+        return new BaseResponse<>(true, new GroupDataResponse(
+                group.getId(),
+                group.getName(),
+                group.getCustomFirstname(),
+                group.getCustomLastname(),
+                group.getPhoto(),
+                group.getKey(),
+                group.getStatus(),
+                group.isGroup(),
+                null,
+                channels
+        ));
+    }
 
     // implement create channel
     @PostMapping("")
@@ -71,8 +98,15 @@ public class ContactController {
             ));
         }
         String key = UUID.randomUUID().toString();
-        Group group = groupService.save(key, addContactDto.getFirstName(), addContactDto.getLastName());
-        groupService.saveGroupChannels(group, Set.of(channel1, channel2));
+        Group group = groupService.save(
+                key,
+                addContactDto.getFirstName() + ' ' + addContactDto.getLastName(),
+                addContactDto.getFirstName(),
+                addContactDto.getLastName(),
+                null,
+                false
+        );
+        groupService.saveGroupChannels(group, List.of(channel1, channel2));
         return new BaseResponse<>(true, new GroupDataResponse(
                 group.getId(),
                 group.getName(),
