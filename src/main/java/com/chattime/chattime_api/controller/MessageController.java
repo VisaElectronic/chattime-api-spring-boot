@@ -11,6 +11,9 @@ import com.chattime.chattime_api.model.*;
 import com.chattime.chattime_api.service.ChannelService;
 import com.chattime.chattime_api.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Controller;
 
 import com.chattime.chattime_api.service.MessageService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -115,7 +119,12 @@ public class MessageController {
     ) {
         User user = messageService.getUserFromSocketConnection(headerAccessor);
         Group group = groupService.findByKey(group_id);
-        List<Message> messages = messageService.getMessagesByGroup(group);
+        int limit  = connectDto.getLimit();
+        int offset =  connectDto.getOffset();
+        int page   = offset / limit;
+        Pageable pg = PageRequest.of(page, limit, Sort.by("createdAt").descending());
+        List<Message> messages = messageService.getMessagesByGroup(group, pg);
+        Collections.reverse(messages);
         return new BaseResponse<>(true, MessageDataResponse.fromList(messages, user));
     }
 }

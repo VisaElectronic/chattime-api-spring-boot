@@ -5,6 +5,7 @@ import com.chattime.chattime_api.repository.ChannelRepository;
 import com.chattime.chattime_api.repository.MessageRepository;
 import com.chattime.chattime_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class MessageService {
         return user.getUser();
     }
 
-    public List<Message> getMessagesByGroup(Group group) {
-        return messageRepository.findAllByGroupId(group.getId());
+    public List<Message> getMessagesByGroup(Group group, Pageable pg) {
+        return messageRepository.paginateByGroupId(group.getId(), pg);
     }
 }

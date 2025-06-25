@@ -6,10 +6,15 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ConnectChatDto {
-    private Boolean isGroup = false;
+    private int limit = 30;
+    private int offset = 0;
 
-    public ConnectChatDto(Boolean isGroup) {
-        this.isGroup = isGroup;
+    public ConnectChatDto(
+        int limit,
+        int offset
+    ) {
+        this.limit = limit;
+        this.offset = offset;
     }
 
 }
