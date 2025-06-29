@@ -1,20 +1,23 @@
 package com.chattime.chattime_api.dto.response.login;
 
+import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class LoginDataResponse {
-    private String access_token;
+    private String accessToken;
+    private ProfileDataResponse profile;
 
     public LoginDataResponse() {
     }
 
-    public LoginDataResponse(String access_token) {
-        this.access_token = access_token;
-    }
-
-    public String getAccessToken() {
-        return access_token;
-    }
-
-    public void setAccessToken(String token) {
-        this.access_token = token;
+    public LoginDataResponse(
+        String access_token,
+        ProfileDataResponse profile
+    ) {
+        this.accessToken = access_token;
+        this.profile = profile;
     }
 }

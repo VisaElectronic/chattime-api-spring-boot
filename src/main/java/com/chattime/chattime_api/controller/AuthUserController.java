@@ -53,8 +53,21 @@ public class AuthUserController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody UserDto userDto) {
-        String access_token = userService.verify(userDto);
-        LoginDataResponse loginDataResponse = new LoginDataResponse(access_token);
+        User user = userService.findByEmail(userDto.getEmail());
+        String access_token = userService.verify(userDto, user);
+        ProfileDataResponse profile = new ProfileDataResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getAvatar(),
+                user.getKey(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getPhone(),
+                user.getDob(),
+                user.getBio()
+        );
+        LoginDataResponse loginDataResponse = new LoginDataResponse(access_token, profile);
         return new LoginResponse(true, loginDataResponse);
     }
 

@@ -2,6 +2,7 @@ package com.chattime.chattime_api.controller;
 
 import com.chattime.chattime_api.dto.MessageDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
+import com.chattime.chattime_api.dto.response.channel.ChannelOnlineResponse;
 import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.dto.response.message.MessageDataResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
@@ -57,8 +58,12 @@ public class MessageController {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
                 List<Group> groups = groupService.findAllByUserKey(channel.getKey(), user);
                 /* Send To Online Channel For Loading The Channel To Left Side-Bar */
+                ChannelOnlineResponse notifyGroup = new ChannelOnlineResponse(
+                    "NOTIFY_GROUP",
+                        GroupDataResponse.from(group, user, List.of())
+                );
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
-                    new BaseResponse<>(true, GroupDataResponse.fromList(groups, user))
+                    new BaseResponse<>(true, notifyGroup)
                 );
             }
         }
@@ -99,7 +104,7 @@ public class MessageController {
 
     @MessageMapping("/channel/{user_key}/connect")
     @SendTo("/channel/{user_key}/online")
-    public BaseResponse<List<GroupDataResponse>> onlineUserSocket(
+    public BaseResponse<ChannelOnlineResponse> onlineUserSocket(
             @DestinationVariable String user_key,
             ConnectOnlineDto connectDto,
             StompHeaderAccessor headerAccessor
@@ -107,7 +112,7 @@ public class MessageController {
         User user = messageService.getUserFromSocketConnection(headerAccessor);
         channelService.create(user_key, user.getUsername(), user);
         List<Group> groups = groupService.findAllByUserKey(user.getKey(), user);
-        return new BaseResponse<>(true, GroupDataResponse.fromList(groups, user));
+        return new BaseResponse<>(true, new ChannelOnlineResponse("LIST_GROUPS", GroupDataResponse.fromList(groups, user)));
     }
 
     @MessageMapping("/channel/{group_id}/chat/connect")

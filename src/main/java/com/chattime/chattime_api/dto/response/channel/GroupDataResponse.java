@@ -73,4 +73,25 @@ public class GroupDataResponse {
         }).toList();
     }
 
+    public static List<GroupDataResponse> from(Group group, User currentUser, List<Channel> channels) {
+        Channel recipientChannel = null;
+        if(!group.isGroup()) {
+            recipientChannel = channels.stream()
+                    .filter(item -> !item.getKey().equals(currentUser.getKey()))
+                    .findFirst().orElseThrow();
+        }
+        return List.of(new GroupDataResponse(
+                group.getId(),
+                group.getName(),
+                group.getCustomFirstname(),
+                group.getCustomLastname(),
+                group.getPhoto(),
+                group.getKey(),
+                group.getStatus(),
+                group.isGroup(),
+                recipientChannel,
+                new ArrayList<>(channels)
+        ));
+    }
+
 }

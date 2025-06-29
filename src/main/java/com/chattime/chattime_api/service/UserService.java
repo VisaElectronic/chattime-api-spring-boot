@@ -37,8 +37,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String verify(UserDto userDto) {
-        User user = userRepository.findByEmail(userDto.getEmail());
+    public String verify(UserDto userDto, User user) {
         Authentication authentication =
                 authManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
         if(authentication.isAuthenticated()) {
