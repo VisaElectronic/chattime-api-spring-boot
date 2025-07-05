@@ -27,6 +27,7 @@ import com.chattime.chattime_api.service.MessageService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Controller
 public class MessageController {
@@ -54,13 +55,14 @@ public class MessageController {
         Group group = groupService.findByKeyAndFetchChannels(group_id);
         Message message = messageService.addMessage(new Message(messageDto.getContent(), user, group));
 
-        for (Channel channel : group.getChannels()) {
+        Set<Channel> channels = group.getChannels();
+
+        for (Channel channel : channels) {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
-                List<Group> groups = groupService.findAllByUserKey(channel.getKey(), user);
                 /* Send To Online Channel For Loading The Channel To Left Side-Bar */
                 ChannelOnlineResponse notifyGroup = new ChannelOnlineResponse(
                     "NOTIFY_GROUP",
-                        GroupDataResponse.from(group, user, List.of())
+                        GroupDataResponse.from(group, channel.getUser(), channels.stream().toList())
                 );
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
                     new BaseResponse<>(true, notifyGroup)
@@ -129,7 +131,7 @@ public class MessageController {
         int page   = offset / limit;
         Pageable pg = PageRequest.of(page, limit, Sort.by("createdAt").descending());
         List<Message> messages = messageService.getMessagesByGroup(group, pg);
-        Collections.reverse(messages);
+//        Collections.reverse(messages);
         return new BaseResponse<>(true, MessageDataResponse.fromList(messages, user));
     }
 }
