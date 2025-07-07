@@ -4,6 +4,7 @@ import com.chattime.chattime_api.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ public class ProfileDataResponse {
     private String firstname;
     private String lastname;
     private String phone;
-    private String dob;
+    private LocalDateTime dob;
     private String bio;
 
     public ProfileDataResponse(
@@ -30,7 +31,7 @@ public class ProfileDataResponse {
         String firstname,
         String lastname,
         String phone,
-        String dob,
+        LocalDateTime dob,
         String bio
     ) {
         this.id = id;

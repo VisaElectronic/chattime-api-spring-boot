@@ -1,6 +1,10 @@
 package com.chattime.chattime_api.controller;
 
+import com.chattime.chattime_api.dto.UserDto;
+import com.chattime.chattime_api.dto.request.ProfileUpdateDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
+import com.chattime.chattime_api.dto.response.register.RegisterDataResponse;
+import com.chattime.chattime_api.dto.response.register.RegisterResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.model.UserPrincipal;
@@ -15,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,5 +81,38 @@ public class UserController {
         }
         String[] parts = !filePath.isEmpty() ? filePath.getFirst().toString().split("/") : new String[0];
         String avatarPath = parts.length > 4 ? String.join("/", Arrays.copyOfRange(parts, 4, parts.length)) : null;
+    }
+
+    @PostMapping("/profile")
+    public BaseResponse<ProfileDataResponse> updateProfile(
+        @RequestPart("avatar") List<MultipartFile> files,
+        @RequestParam("firstname") String firstname,
+        @RequestParam("lastname") String lastname,
+        @RequestParam("bio") String bio,
+        @RequestParam("dob") String dob
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = ((UserPrincipal) authentication.getPrincipal()).getUser();
+        LocalDate date = LocalDate.parse(dob);
+        LocalDateTime dobFormatted = date.atStartOfDay();
+        ProfileUpdateDto dto = new ProfileUpdateDto(
+                firstname,
+                lastname,
+                bio,
+                dobFormatted
+        );
+        user = userService.updateProfile(user, dto, files);
+        return new BaseResponse<>(true, new ProfileDataResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getAvatar(),
+                user.getKey(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getPhone(),
+                user.getDob(),
+                user.getBio()
+        ));
     }
 }

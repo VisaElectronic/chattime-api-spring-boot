@@ -1,6 +1,8 @@
 package com.chattime.chattime_api.service;
 
 import com.chattime.chattime_api.dto.UserDto;
+import com.chattime.chattime_api.dto.request.ProfileUpdateDto;
+import com.chattime.chattime_api.interfaces.FileStorageService;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,6 +26,10 @@ public class UserService {
 
     @Autowired
     private JWTService jwtService;
+
+    @Autowired
+    private FileSystemStorageService storage;
+    // ...
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -70,5 +78,32 @@ public class UserService {
 
     public User findByPhone(String phone) {
         return userRepository.findByPhone(phone);
+    }
+
+    public User updateProfile(
+            User user,
+            ProfileUpdateDto dto,
+            List<MultipartFile> files
+    ) {
+        // 2) update fields
+        user.setFirstname(dto.getFirstname());
+        user.setLastname(dto.getLastname());
+        user.setBio(dto.getBio());
+        user.setDob(dto.getDob());
+
+        // Store each file and collect the relative filenames:
+        List<String> stored = new ArrayList<>();
+        if (files != null) {
+            for (MultipartFile f : files) {
+                String filename = storage.storeFile(f);
+                stored.add(filename);
+            }
+        }
+
+        // If you just want the first upload as "avatar":
+        String avatarFilename = stored.isEmpty() ? null : stored.getFirst();
+        user.setAvatar(avatarFilename);
+
+        return userRepository.save(user);
     }
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenerationTime;
 
 import javax.annotation.processing.Generated;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -27,7 +28,7 @@ public class User {
     private String firstname;
     private String lastname;
     private String phone;
-    private String dob;
+    private LocalDateTime dob;
     private String bio;
     @Column(name = "created_at")
     @JsonIgnore
