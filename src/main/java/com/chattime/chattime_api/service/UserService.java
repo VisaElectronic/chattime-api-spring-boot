@@ -102,7 +102,7 @@ public class UserService {
 
         // If you just want the first upload as "avatar":
         String avatarFilename = stored.isEmpty() ? null : stored.getFirst();
-        user.setAvatar(avatarFilename);
+        if(avatarFilename != null) user.setAvatar(avatarFilename);
 
         return userRepository.save(user);
     }

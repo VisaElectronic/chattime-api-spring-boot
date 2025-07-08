@@ -21,5 +21,10 @@ public class ProfileUpdateDto {
         String lastname,
         String bio,
         LocalDateTime dob
-    ) {}
+    ) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.bio = bio;
+        this.dob = dob;
+    }
 }

@@ -13,17 +13,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.*;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class FileSystemStorageService implements FileStorageService, InitializingBean {
 
     private final Path baseLocation;
+    private final String storageLocation;
 
     public FileSystemStorageService(
             @Value("${app.storage.location}") String storageLocation
     ) {
         this.baseLocation = Paths.get(storageLocation).toAbsolutePath().normalize();
+        this.storageLocation = storageLocation;
     }
 
     /** Ensure the directory exists **/
@@ -38,7 +41,7 @@ public class FileSystemStorageService implements FileStorageService, Initializin
 
     @Override
     public String storeFile(MultipartFile file) {
-        String original = StringUtils.cleanPath(file.getOriginalFilename());
+        String original = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String ext = "";
         int dot = original.lastIndexOf('.');
         if (dot >= 0) ext = original.substring(dot);
@@ -55,7 +58,7 @@ public class FileSystemStorageService implements FileStorageService, Initializin
 
             Path target = baseLocation.resolve(generated);
             Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-            return generated;
+            return storageLocation + "/" + generated;
         } catch (IOException e) {
             throw new FileStorageException("Failed to store file " + original, e);
         }

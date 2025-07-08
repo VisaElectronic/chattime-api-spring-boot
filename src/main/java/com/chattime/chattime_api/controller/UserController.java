@@ -11,6 +11,7 @@ import com.chattime.chattime_api.model.UserPrincipal;
 import com.chattime.chattime_api.service.UserService;
 import com.chattime.chattime_api.service.UtilService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -85,11 +86,11 @@ public class UserController {
 
     @PostMapping("/profile")
     public BaseResponse<ProfileDataResponse> updateProfile(
-        @RequestPart("avatar") List<MultipartFile> files,
-        @RequestParam("firstname") String firstname,
-        @RequestParam("lastname") String lastname,
-        @RequestParam("bio") String bio,
-        @RequestParam("dob") String dob
+        @RequestPart(name="avatar", required = false) List<MultipartFile> avatars,
+        @RequestPart("firstname") String firstname,
+        @RequestPart("lastname") String lastname,
+        @RequestPart("bio") String bio,
+        @RequestPart("dob") String dob
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = ((UserPrincipal) authentication.getPrincipal()).getUser();
@@ -101,7 +102,7 @@ public class UserController {
                 bio,
                 dobFormatted
         );
-        user = userService.updateProfile(user, dto, files);
+        user = userService.updateProfile(user, dto, avatars);
         return new BaseResponse<>(true, new ProfileDataResponse(
                 user.getId(),
                 user.getUsername(),
