@@ -2,7 +2,6 @@ package com.chattime.chattime_api.service;
 
 import com.chattime.chattime_api.dto.UserDto;
 import com.chattime.chattime_api.dto.request.ProfileUpdateDto;
-import com.chattime.chattime_api.interfaces.FileStorageService;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

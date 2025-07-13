@@ -7,11 +7,9 @@ import com.chattime.chattime_api.repository.ChannelRepository;
 import com.chattime.chattime_api.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class GroupService {
@@ -21,6 +19,9 @@ public class GroupService {
 
     @Autowired
     private ChannelRepository channelRepository;
+
+    @Autowired
+    private FileSystemStorageService storage;
 
     public Group findByKey(String key) {
         return groupRepository.findByKey(key);
@@ -48,6 +49,32 @@ public class GroupService {
                 1
             );
         }
+        return groupRepository.save(group);
+    }
+
+    public Group create(
+            String key,
+            String fullName,
+            List<MultipartFile> files
+    ) {
+        // Store each file and collect the relative filenames:
+        List<String> stored = new ArrayList<>();
+        if (files != null) {
+            for (MultipartFile f : files) {
+                String filename = storage.storeFile(f);
+                stored.add(filename);
+            }
+        }
+        String photoPath = stored.isEmpty() ? null : stored.getFirst();
+        Group group = new Group(
+                key,
+                fullName,
+                null,
+                null,
+                photoPath,
+                1,
+                1
+        );
         return groupRepository.save(group);
     }
 

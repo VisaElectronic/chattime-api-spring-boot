@@ -18,6 +18,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -38,18 +39,21 @@ public class ContactController {
     private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/group")
-    public BaseResponse<Object> createGroup(@RequestBody AddGroupDto addGroupDto) {
+    public BaseResponse<Object> createGroup(
+        @RequestPart(name="photo", required = false) List<MultipartFile> photo,
+        @RequestPart("groupName") String groupName,
+        @RequestParam("channelKeys") List<String> channelKeys
+    ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
         // add current user channel key to body
-        addGroupDto.addChannelKey(currentUser.getKey());
-        List<Channel> channels = channelService.findAllByKeyIn(addGroupDto.getChannelKeys());
+        channelKeys.add(currentUser.getKey());
+        List<Channel> channels = channelService.findAllByKeyIn(channelKeys);
         String key = UUID.randomUUID().toString();
-        Group group = groupService.save(
+        Group group = groupService.create(
             key,
-            addGroupDto.getTitle(),null, null,
-            addGroupDto.getProfile(),
-                true
+            groupName,
+            photo
         );
         groupService.saveGroupChannels(group, channels);
         return new BaseResponse<>(true, new GroupDataResponse(
