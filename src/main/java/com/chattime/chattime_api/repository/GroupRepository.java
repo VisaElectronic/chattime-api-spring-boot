@@ -14,8 +14,16 @@ import java.util.List;
 public interface GroupRepository extends JpaRepository<Group, Long> {
     Group findByKey(String key);
 
-    @Query("SELECT g FROM Group g JOIN g.channels c WHERE c.key IN (:keys) GROUP BY g HAVING COUNT(DISTINCT c.key) = :keyCount")
-    List<Group> findGroupsContainingKeys(@Param("keys") List<String> keys, @Param("keyCount") long keyCount);
+    @Query("""
+      SELECT g
+        FROM Group g
+        JOIN g.channels c
+       WHERE c.key IN (:keys)
+         AND g.isGroup = :isGroup
+    GROUP BY g
+      HAVING COUNT(DISTINCT c.key) = 2
+    """)
+    List<Group> findGroupsContainingKeys(@Param("keys") List<String> keys, int isGroup);
 
     @Query("SELECT g FROM Group g JOIN g.channels c WHERE c.key = :key")
     List<Group> findByChannelsKey(@Param("key") String key);

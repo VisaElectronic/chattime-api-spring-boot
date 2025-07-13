@@ -75,8 +75,7 @@ public class MessageController {
                 message.getContent(),
                 group,
                 user,
-                message.getCreatedAt(),
-                user
+                message.getCreatedAt()
         ));
     }
 

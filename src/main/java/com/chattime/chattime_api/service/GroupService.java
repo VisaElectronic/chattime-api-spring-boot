@@ -63,8 +63,8 @@ public class GroupService {
         groupRepository.save(group);
     }
 
-    public List<Group> findGroupsWithKeys(String key1, String key2) {
-        return groupRepository.findGroupsContainingKeys(Arrays.asList(key1, key2), 2);
+    public List<Group> findGroupsWithKeys(String key1, String key2, boolean isGroup) {
+        return groupRepository.findGroupsContainingKeys(Arrays.asList(key1, key2), isGroup ? 1 : 0);
     }
 
     public List<Group> findAllByUserKey(String userChannelKey, User user) {

@@ -73,29 +73,18 @@ public class ContactController {
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
         User user = userService.findByPhone(addContactDto.getPhoneNumber());
         if(user == null) {
-            return new BaseResponse<>(false, "The person with this phone number is not registered on Telegram yet.");
+            return new BaseResponse<>(false, "The person with this phone number is not registered on App yet.");
         }
         if(Objects.equals(currentUser.getEmail(), user.getEmail())) {
-            throw new IllegalArgumentException("You can't add yourself as a contact");
+            return new BaseResponse<>(false, "You can't add yourself as a contact.");
         }
         Channel channel1 = channelService.create(user.getKey(), user.getUsername(), user);
         channel1.setUser(user);
         Channel channel2 = channelService.create(currentUser.getKey(), currentUser.getUsername(), currentUser);
-        List<Group> existingGroups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey());
+        List<Group> existingGroups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey(), false);
         if (!existingGroups.isEmpty()) {
             Group firstGroup = existingGroups.getFirst();
-            return new BaseResponse<>(true, new GroupDataResponse(
-                    firstGroup.getId(),
-                    firstGroup.getName(),
-                    firstGroup.getCustomFirstname(),
-                    firstGroup.getCustomLastname(),
-                    firstGroup.getPhoto(),
-                    firstGroup.getKey(),
-                    firstGroup.getStatus(),
-                    firstGroup.isGroup(),
-                    channel1,
-                    List.of(channel1, channel2)
-            ));
+            return new BaseResponse<>(false, "You already has a contact with this phone's owner.");
         }
         String key = UUID.randomUUID().toString();
         Group group = groupService.save(

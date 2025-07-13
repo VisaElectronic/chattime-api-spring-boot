@@ -17,7 +17,6 @@ public class MessageDataResponse {
     private Long id;
     private String content;
     private Date createdAt;
-    private User newClient;
     private GroupDataResponse group;
     private User user;
 
@@ -29,8 +28,7 @@ public class MessageDataResponse {
             String content,
             Group group,
             User user,
-            Date createdAt,
-            User newClient
+            Date createdAt
     ) {
         this.id = id;
         this.content = content;
@@ -48,7 +46,6 @@ public class MessageDataResponse {
         );
         this.user = user;
         this.createdAt = createdAt;
-        this.newClient = newClient;
     }
 
     public static List<MessageDataResponse> fromList(List<Message> messages, User currentLoginUser) {
@@ -59,8 +56,7 @@ public class MessageDataResponse {
                     message.getContent(),
                     message.getGroup(),
                     sender,
-                    message.getCreatedAt(),
-                    currentLoginUser
+                    message.getCreatedAt()
             );
         }).toList();
     }
