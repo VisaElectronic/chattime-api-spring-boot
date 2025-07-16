@@ -38,38 +38,6 @@ public class ContactController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @PostMapping("/group")
-    public BaseResponse<Object> createGroup(
-        @RequestPart(name="photo", required = false) List<MultipartFile> photo,
-        @RequestPart("groupName") String groupName,
-        @RequestParam("channelKeys") List<String> channelKeys
-    ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
-        // add current user channel key to body
-        channelKeys.add(currentUser.getKey());
-        List<Channel> channels = channelService.findAllByKeyIn(channelKeys);
-        String key = UUID.randomUUID().toString();
-        Group group = groupService.create(
-            key,
-            groupName,
-            photo
-        );
-        groupService.saveGroupChannels(group, channels);
-        return new BaseResponse<>(true, new GroupDataResponse(
-                group.getId(),
-                group.getName(),
-                group.getCustomFirstname(),
-                group.getCustomLastname(),
-                group.getPhoto(),
-                group.getKey(),
-                group.getStatus(),
-                group.isGroup(),
-                null,
-                channels
-        ));
-    }
-
     // implement create channel
     @PostMapping("")
     public BaseResponse<Object> create(@RequestBody AddContactDto addContactDto) {
