@@ -93,8 +93,6 @@ public class GroupController {
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
-        // add current user channel key to body
-        channelKeys.add(currentUser.getKey());
         List<Channel> channels = channelService.findAllByKeyIn(channelKeys);
         Group group = groupService.findByKey(groupKey);
         groupService.save(

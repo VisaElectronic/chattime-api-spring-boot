@@ -48,8 +48,8 @@ public class GroupService {
 
         if(group != null) {
             group.setStatus(1);
-            fullName = fullName != null ? group.getName() : fullName;
-            photoPath = photoPath != null ? group.getPhoto() : photoPath;
+            fullName = fullName == null ? group.getName() : fullName;
+            photoPath = photoPath == null ? group.getPhoto() : photoPath;
             group.setName(fullName);
             group.setPhoto(photoPath);
         } else {
@@ -100,7 +100,9 @@ public class GroupService {
     }
 
     public void saveGroupChannels(Group group, List<Channel> channels) {
-        group.setChannels(new HashSet<>(channels));
+        channels.forEach(ch -> {
+            group.getChannels().add(ch);
+        });
         groupRepository.save(group);
     }
 
