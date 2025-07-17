@@ -24,4 +24,16 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
     List<Channel> findByGroupsIdAndNotKey(@Param("id") Long id, @Param("key") String key);
 
     List<Channel> findAllByKeyIn(Collection<String> keys);
+
+    @Query("""
+      SELECT c
+      FROM   Channel c
+      WHERE  c NOT IN (
+        SELECT ch
+        FROM   Group g
+        JOIN   g.channels ch
+        WHERE  g.key = :key
+      )
+    """)
+    List<Channel> findAllNotInGroup(@Param("key") String key);
 }

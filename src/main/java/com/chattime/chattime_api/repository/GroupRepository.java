@@ -31,7 +31,12 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT g FROM Group g JOIN g.channels c JOIN FETCH g.channels WHERE c.key = :key")
     List<Group> findByChannelsKeyAndFetchChannels(@Param("key") String key);
 
-    @Query("SELECT g FROM Group g JOIN g.channels c JOIN FETCH g.channels WHERE g.key = :key")
+    @Query("""
+      SELECT DISTINCT g
+      FROM   Group g
+      LEFT   JOIN FETCH g.channels
+      WHERE  g.key = :key
+    """)
     List<Group> findByKeyAndFetchChannels(@Param("key") String key);
 
     @Query("""

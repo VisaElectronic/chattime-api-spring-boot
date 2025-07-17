@@ -32,19 +32,33 @@ public class GroupService {
             String fullName,
             String customFirstname,
             String customLastname,
-            String profile,
+            List<MultipartFile> files,
             boolean isGroup
     ) {
         Group group = groupRepository.findByKey(key);
+
+        List<String> stored = new ArrayList<>();
+        if (files != null) {
+            for (MultipartFile f : files) {
+                String filename = storage.storeFile(f);
+                stored.add(filename);
+            }
+        }
+        String photoPath = stored.isEmpty() ? null : stored.getFirst();
+
         if(group != null) {
             group.setStatus(1);
+            fullName = fullName != null ? group.getName() : fullName;
+            photoPath = photoPath != null ? group.getPhoto() : photoPath;
+            group.setName(fullName);
+            group.setPhoto(photoPath);
         } else {
             group = new Group(
                 key,
                 fullName,
                 customFirstname,
                 customLastname,
-                profile,
+                photoPath,
                 isGroup ? 1 : 0,
                 1
             );
