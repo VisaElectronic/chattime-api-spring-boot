@@ -6,10 +6,7 @@ import com.chattime.chattime_api.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -22,8 +19,8 @@ public class GroupDataResponse {
     private String key;
     private int status;
     private boolean isGroup;
-    private Channel channel;
-    private List<Channel> channels;
+    private ChannelData channel;
+    private List<ChannelData> channels;
 
     public GroupDataResponse(
             Long id,
@@ -34,8 +31,8 @@ public class GroupDataResponse {
             String key,
             int status,
             boolean isGroup,
-            Channel channel,
-            List<Channel> channels
+            ChannelData channel,
+            List<ChannelData> channels
     ) {
         this.id = id;
         this.name = name;
@@ -52,11 +49,28 @@ public class GroupDataResponse {
     public static List<GroupDataResponse> fromList(List<Group> groups, User currentUser) {
         return groups.stream().map(group -> {
             Set<Channel> channels = group.getChannels();
-            Channel recipientChannel = null;
+            List<ChannelData> channelDtos = channels.stream()
+                    .map(ch -> new ChannelData(
+                            ch.getId(),
+                            ch.getKey(),
+                            ch.getName(),
+                            ch.getUser()
+                    ))
+                    .toList();
+            ChannelData recipientChannel = null;
             if(!group.isGroup()) {
                 recipientChannel = channels.stream()
+                    .map(ch -> new ChannelData(
+                            ch.getId(),
+                            ch.getKey(),
+                            ch.getName(),
+                            ch.getUser()
+                    ))
                     .filter(item -> !item.getKey().equals(currentUser.getKey()))
-                    .findFirst().orElseThrow();
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException(
+                            "No recipient channel found for user " + currentUser.getKey()
+                    ));
             }
             return new GroupDataResponse(
                     group.getId(),
@@ -68,17 +82,34 @@ public class GroupDataResponse {
                     group.getStatus(),
                     group.isGroup(),
                     recipientChannel,
-                    new ArrayList<>(channels)
+                    channelDtos
             );
         }).toList();
     }
 
     public static List<GroupDataResponse> from(Group group, User currentUser, List<Channel> channels) {
-        Channel recipientChannel = null;
+        ChannelData recipientChannel = null;
+        List<ChannelData> channelDtos = channels.stream()
+                .map(ch -> new ChannelData(
+                        ch.getId(),
+                        ch.getKey(),
+                        ch.getName(),
+                        ch.getUser()
+                ))
+                .toList();
         if(!group.isGroup()) {
             recipientChannel = channels.stream()
+                    .map(ch -> new ChannelData(
+                            ch.getId(),
+                            ch.getKey(),
+                            ch.getName(),
+                            ch.getUser()
+                    ))
                     .filter(item -> !item.getKey().equals(currentUser.getKey()))
-                    .findFirst().orElseThrow();
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException(
+                            "No recipient channel found for user " + currentUser.getKey()
+                    ));
         }
         return List.of(new GroupDataResponse(
                 group.getId(),
@@ -89,8 +120,8 @@ public class GroupDataResponse {
                 group.getKey(),
                 group.getStatus(),
                 group.isGroup(),
-                recipientChannel,
-                new ArrayList<>(channels)
+                null,
+                channelDtos
         ));
     }
 

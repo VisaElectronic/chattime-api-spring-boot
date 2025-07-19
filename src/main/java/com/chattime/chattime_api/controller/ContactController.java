@@ -1,10 +1,9 @@
 package com.chattime.chattime_api.controller;
 
 import com.chattime.chattime_api.dto.request.AddContactDto;
-import com.chattime.chattime_api.dto.request.AddGroupDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
-import com.chattime.chattime_api.dto.response.channel.ChannelSearchData;
+import com.chattime.chattime_api.dto.response.channel.ChannelData;
 import com.chattime.chattime_api.model.Channel;
 import com.chattime.chattime_api.model.Group;
 import com.chattime.chattime_api.model.User;
@@ -13,15 +12,13 @@ import com.chattime.chattime_api.service.ChannelService;
 import com.chattime.chattime_api.service.GroupService;
 import com.chattime.chattime_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/contacts")
@@ -67,7 +64,17 @@ public class ContactController {
                 null,
                 false
         );
-        groupService.saveGroupChannels(group, List.of(channel1, channel2));
+        groupService.saveGroupChannels(group, List.of(channel1, channel2), currentUser);
+
+        List<ChannelData> channels = Stream.of(channel1, channel2)
+                .map(ch -> new ChannelData(
+                        ch.getId(),
+                        ch.getKey(),
+                        ch.getName(),
+                        ch.getUser()
+                ))
+                .toList();
+
         return new BaseResponse<>(true, new GroupDataResponse(
                 group.getId(),
                 group.getName(),
@@ -77,24 +84,29 @@ public class ContactController {
                 group.getKey(),
                 group.getStatus(),
                 group.isGroup(),
-                channel1,
-                List.of(channel1, channel2)
+                new ChannelData(
+                    channel1.getId(),
+                    channel1.getKey(),
+                    channel1.getName(),
+                    channel1.getUser()
+                ),
+                channels
         ));
     }
 
     @GetMapping("/search")
-    public BaseResponse<List<ChannelSearchData>> search(
+    public BaseResponse<List<ChannelData>> search(
             @RequestParam String search
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
         var groups = groupService.searchGroups(currentUser.getId(), search);
-        List<Channel> searchedChannels = ChannelSearchData.fromGroup(groups, currentUser);
+        List<Channel> searchedChannels = ChannelData.fromGroup(groups, currentUser);
         var channels = searchedChannels
                 .stream()
-                .map(ChannelSearchData::from)
+                .map(ChannelData::from)
                 .toList();
-        return new BaseResponse<List<ChannelSearchData>>(true, channels);
+        return new BaseResponse<List<ChannelData>>(true, channels);
     }
 
     // implement list of channels

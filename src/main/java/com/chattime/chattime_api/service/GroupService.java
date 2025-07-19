@@ -92,16 +92,20 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
-    public void saveGroupChannels(Group group, List<Channel> channels) {
-        channels.forEach(ch ->
-            group.addChannel(ch, 1)
-        );
+    public void saveGroupChannels(
+        Group group,
+        List<Channel> channels,
+        User currentUser
+    ) {
+        channels.forEach(ch -> {
+            if(currentUser != null && Objects.equals(ch.getKey(), currentUser.getKey())) {
+                group.addChannel(ch, 2);
+            } else {
+                group.addChannel(ch, 1);
+            }
+        });
 
         groupRepository.save(group);
-//        channels.forEach(ch -> {
-//            group.getChannels().add(ch);
-//        });
-//        groupRepository.save(group);
     }
 
     public List<Group> findGroupsWithKeys(String key1, String key2, boolean isGroup) {
@@ -127,5 +131,13 @@ public class GroupService {
 
     public List<Group> searchGroups(Long userId, String searchText) {
         return groupRepository.findByUserAndSearchText(userId, searchText.trim());
+    }
+
+    public Group findByKeyAndFetchMembers(String key) {
+        List<Group> group = groupRepository.findByKeyAndFetchMembers(key);
+        if(!group.isEmpty()) {
+            return group.getFirst();
+        }
+        return null;
     }
 }

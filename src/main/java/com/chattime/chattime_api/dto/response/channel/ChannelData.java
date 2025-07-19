@@ -10,13 +10,13 @@ import java.util.*;
 
 @Getter
 @Setter
-public class ChannelSearchData {
+public class ChannelData {
     Long   id;
     String key;
     String name;
     User user;
 
-    public ChannelSearchData(
+    public ChannelData(
             Long id,
             String key,
             String name,
@@ -28,8 +28,8 @@ public class ChannelSearchData {
         this.user = user;
     }
 
-    public static ChannelSearchData from(Channel c) {
-        return new ChannelSearchData(
+    public static ChannelData from(Channel c) {
+        return new ChannelData(
                 c.getId(),
                 c.getKey(),
                 c.getName(),

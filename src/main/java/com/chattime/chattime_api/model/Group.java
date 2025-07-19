@@ -53,12 +53,10 @@ public class Group {
     public void addChannel(Channel channel, int role) {
         GroupChannel gc = new GroupChannel(this, channel, role);
         members.add(gc);
-        channel.getMembers().add(gc);
     }
 
     public void removeChannel(Channel channel) {
         members.removeIf(gc -> gc.getChannel().equals(channel));
-        channel.getMembers().removeIf(gc -> gc.getGroup().equals(this));
     }
 
     // Constructors

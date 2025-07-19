@@ -57,4 +57,12 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
             @Param("userId") Long userId,
             @Param("searchText") String searchText
     );
+
+    @Query("""
+      SELECT DISTINCT g
+      FROM   Group g
+      LEFT   JOIN FETCH g.members
+      WHERE  g.key = :key
+    """)
+    List<Group> findByKeyAndFetchMembers(@Param("key") String key);
 }

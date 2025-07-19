@@ -1,7 +1,8 @@
 package com.chattime.chattime_api.controller;
 
 import com.chattime.chattime_api.dto.response.BaseResponse;
-import com.chattime.chattime_api.dto.response.channel.ChannelSearchData;
+import com.chattime.chattime_api.dto.response.channel.ChannelData;
+import com.chattime.chattime_api.dto.response.channel.ChannelMemberData;
 import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.model.Channel;
 import com.chattime.chattime_api.model.Group;
@@ -46,7 +47,17 @@ public class GroupController {
                 groupName,
                 photo
         );
-        groupService.saveGroupChannels(group, channels);
+        groupService.saveGroupChannels(group, channels, currentUser);
+
+        List<ChannelData> channelMaps = channels.stream()
+                .map(ch -> new ChannelData(
+                        ch.getId(),
+                        ch.getKey(),
+                        ch.getName(),
+                        ch.getUser()
+                ))
+                .toList();
+
         return new BaseResponse<>(true, new GroupDataResponse(
             group.getId(),
             group.getName(),
@@ -57,28 +68,28 @@ public class GroupController {
             group.getStatus(),
             group.isGroup(),
             null,
-            channels
+            channelMaps
         ));
     }
 
     @GetMapping("/{key}")
-    public BaseResponse<List<ChannelSearchData>> getGroup(
+    public BaseResponse<List<ChannelMemberData>> getGroup(
         @PathVariable("key") String key,
         @RequestParam("type") String type
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
-        List<ChannelSearchData> channels = List.of();
+        List<ChannelMemberData> channels = List.of();
         if(Objects.equals(type, "MEMBERS")) {
-            Group group = groupService.findByKeyAndFetchChannels(key);
-            channels = group.getChannels()
+            Group group = groupService.findByKeyAndFetchMembers(key);
+            channels = group.getMembers()
                     .stream()
-                    .map(ChannelSearchData::from)
+                    .map(ChannelMemberData::fromMember)
                     .toList();
         } else if(Objects.equals(type, "NOT_MEMBERS")) {
             channels = channelService.findAllNotInGroup(key)
                     .stream()
-                    .map(ChannelSearchData::from)
+                    .map(ChannelMemberData::from)
                     .toList();
         }
         return new BaseResponse<>(true, channels);
@@ -103,7 +114,17 @@ public class GroupController {
             photo,
             true
         );
-        groupService.saveGroupChannels(group, channels);
+        groupService.saveGroupChannels(group, channels, currentUser);
+
+        List<ChannelData> channelMaps = channels.stream()
+                .map(ch -> new ChannelData(
+                        ch.getId(),
+                        ch.getKey(),
+                        ch.getName(),
+                        ch.getUser()
+                ))
+                .toList();
+
         return new BaseResponse<>(true, new GroupDataResponse(
                 group.getId(),
                 group.getName(),
@@ -114,7 +135,7 @@ public class GroupController {
                 group.getStatus(),
                 group.isGroup(),
                 null,
-                channels
+                channelMaps
         ));
     }
 }

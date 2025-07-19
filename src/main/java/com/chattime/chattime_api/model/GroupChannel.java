@@ -10,15 +10,16 @@ import lombok.Setter;
 @Table(name = "groups_channels")
 public class GroupChannel {
 
-    @EmbeddedId
-    private GroupChannelId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("groupId")
+    @JoinColumn(name = "group_id", referencedColumnName = "id")
     private Group group;
 
     @ManyToOne
-    @MapsId("channelId")
+    @JoinColumn(name = "channel_id", referencedColumnName = "id")
     private Channel channel;
 
     @Column(nullable = true)
@@ -30,7 +31,6 @@ public class GroupChannel {
         this.group = group;
         this.channel = channel;
         this.role = role;
-        this.id = new GroupChannelId(group.getId(), channel.getId());
     }
 }
 
