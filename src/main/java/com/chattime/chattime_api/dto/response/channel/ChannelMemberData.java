@@ -9,10 +9,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class ChannelMemberData extends ChannelData {
     private Integer role;
+
+    private LocalDateTime createdAt;
 
     @Autowired
     private UserService userService;
@@ -23,10 +27,12 @@ public class ChannelMemberData extends ChannelData {
             String name,
             User user,
             @Nullable
-            Integer role
+            Integer role,
+            LocalDateTime createdAt
     ) {
         super(id, key, name, user);
         this.role = role;
+        this.createdAt = createdAt;
     }
 
     public static ChannelMemberData fromMember(GroupChannel gc) {
@@ -36,7 +42,8 @@ public class ChannelMemberData extends ChannelData {
                 c.getKey(),
                 c.getName(),
                 c.getCreatedBy(),
-                gc.getRole()
+                gc.getRole(),
+                gc.getCreatedAt()
         );
     }
 
@@ -46,6 +53,7 @@ public class ChannelMemberData extends ChannelData {
                 c.getKey(),
                 c.getName(),
                 c.getCreatedBy(),
+                null,
                 null
         );
     }

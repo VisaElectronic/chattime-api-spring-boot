@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
@@ -24,6 +27,9 @@ public class GroupChannel {
 
     @Column(nullable = true)
     private int role;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     protected GroupChannel() { }
 
