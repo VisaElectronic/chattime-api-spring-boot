@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -31,8 +32,8 @@ public class Group {
     @ManyToMany
     @JoinTable(
             name = "groups_channels",
-            joinColumns = @JoinColumn(name = "group_id"),
-            inverseJoinColumns = @JoinColumn(name = "channel_id")
+            joinColumns = @JoinColumn(name = "group_id", insertable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "channel_id", insertable = false, updatable = false)
     )
     private Set<Channel> channels;
 
@@ -41,6 +42,24 @@ public class Group {
 
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @OneToMany(
+            mappedBy = "group",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<GroupChannel> members = new HashSet<>();
+
+    public void addChannel(Channel channel, int role) {
+        GroupChannel gc = new GroupChannel(this, channel, role);
+        members.add(gc);
+        channel.getMembers().add(gc);
+    }
+
+    public void removeChannel(Channel channel) {
+        members.removeIf(gc -> gc.getChannel().equals(channel));
+        channel.getMembers().removeIf(gc -> gc.getGroup().equals(this));
+    }
 
     // Constructors
     public Group() {

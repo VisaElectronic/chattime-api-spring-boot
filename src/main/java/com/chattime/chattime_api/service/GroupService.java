@@ -92,18 +92,16 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
-    public void saveGroupChannel(Group group, Channel channel) {
-        Set<Channel> channels = new HashSet<>();
-        channels.add(channel);
-        group.setChannels(channels);
-        groupRepository.save(group);
-    }
-
     public void saveGroupChannels(Group group, List<Channel> channels) {
-        channels.forEach(ch -> {
-            group.getChannels().add(ch);
-        });
+        channels.forEach(ch ->
+            group.addChannel(ch, 1)
+        );
+
         groupRepository.save(group);
+//        channels.forEach(ch -> {
+//            group.getChannels().add(ch);
+//        });
+//        groupRepository.save(group);
     }
 
     public List<Group> findGroupsWithKeys(String key1, String key2, boolean isGroup) {
