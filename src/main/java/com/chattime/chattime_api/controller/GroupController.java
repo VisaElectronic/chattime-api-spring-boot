@@ -138,4 +138,17 @@ public class GroupController {
                 channelMaps
         ));
     }
+
+    @DeleteMapping("/{key}/members")
+    public BaseResponse<Object> removeMember(
+        @PathVariable("key") String groupKey,
+        @RequestPart("channelKey") String channelKey
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
+        Group group = groupService.findByKey(groupKey);
+        Channel channel = channelService.findByKey(channelKey);
+        groupService.removeChannel(group, channel);
+        return new BaseResponse<>(true, "User is removed successfully.");
+    }
 }

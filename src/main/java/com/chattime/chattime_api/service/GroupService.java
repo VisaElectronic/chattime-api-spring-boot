@@ -140,4 +140,9 @@ public class GroupService {
         }
         return null;
     }
+
+    public void removeChannel(Group group, Channel channel) {
+        group.removeChannel(channel);
+        groupRepository.save(group);
+    }
 }
