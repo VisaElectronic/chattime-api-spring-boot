@@ -1,30 +1,29 @@
 package com.chattime.chattime_api.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class MessageDto {
     private String content;
-    private String type;
+    private Integer type;
+    private String files;
 
     public MessageDto() {
     }
 
-    public MessageDto(String content, String type) {
+    public MessageDto(
+        String content,
+        Integer type,
+        String files
+    ) {
         this.content = content;
         this.type = type;
+        this.files = files;
     }
 
     public String getContent() {
         return content == null ? "" : content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }

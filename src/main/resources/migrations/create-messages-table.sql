@@ -2,6 +2,8 @@ CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     content TEXT,
     group_id BIGINT NOT NULL,
+    files TEXT,
+    type INT,
     created_by BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

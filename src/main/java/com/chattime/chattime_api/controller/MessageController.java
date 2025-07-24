@@ -53,7 +53,14 @@ public class MessageController {
     ) {
         User user = messageService.getUserFromSocketConnection(headerAccessor);
         Group group = groupService.findByKeyAndFetchChannels(group_id);
-        Message message = messageService.addMessage(new Message(messageDto.getContent(), user, group));
+        Message message = messageService.addMessage(new Message(
+                messageDto.getContent(),
+                user,
+                group,
+                messageDto.getType(),
+                messageDto.getFiles()
+            )
+        );
 
         Set<Channel> channels = group.getChannels();
 
@@ -75,6 +82,8 @@ public class MessageController {
                 message.getContent(),
                 group,
                 user,
+                message.getFiles(),
+                message.getType(),
                 message.getCreatedAt()
         ));
     }

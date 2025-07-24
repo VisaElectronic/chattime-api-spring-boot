@@ -6,11 +6,20 @@ import lombok.Setter;
 @Setter
 @Getter
 public class UploadFileResponse {
-    private String path;
+    private String uri;
+    private String name;
+    private String type;
+    private Long size;
 
     public UploadFileResponse(
-            String path
+        String uri,
+        String name,
+        String type,
+        Long size
     ) {
-        this.path = path;
+        this.uri = uri;
+        this.name = name;
+        this.type = type;
+        this.size = size;
     }
 }

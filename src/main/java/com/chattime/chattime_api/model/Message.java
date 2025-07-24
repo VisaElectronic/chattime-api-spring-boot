@@ -1,11 +1,15 @@
 package com.chattime.chattime_api.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "messages")
 public class Message {
@@ -17,6 +21,11 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "group_id", referencedColumnName = "id")
     private Group group;
+
+    @Column(name = "files", columnDefinition="text")
+    private String files;
+    @Column(name = "type")
+    private Integer type;
 
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
@@ -36,52 +45,17 @@ public class Message {
     public Message() {
     }
 
-    public Message(String content, User user, Group group) {
+    public Message(
+            String content,
+            User user,
+            Group group,
+            Integer type,
+            String files
+    ) {
         this.content = content;
         this.createdBy = user;
         this.group = group;
+        this.type = type;
+        this.files = files;
     }
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-
 }

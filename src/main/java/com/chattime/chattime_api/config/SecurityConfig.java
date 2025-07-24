@@ -44,12 +44,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/uploads/**",
                                 "/ws",
-//                                "/index.html",
-//                                "/main.css",
-//                                "/app.js",
-//                                "/chat.html",
-//                                "/chat.css",
-//                                "/chat.js",
                                 "/login",
                                 "/register"
                         )

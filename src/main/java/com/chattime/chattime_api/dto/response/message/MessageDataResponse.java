@@ -19,6 +19,8 @@ public class MessageDataResponse {
     private Date createdAt;
     private GroupDataResponse group;
     private User user;
+    private String images;
+    private Integer type;
 
     public MessageDataResponse() {
     }
@@ -28,6 +30,8 @@ public class MessageDataResponse {
             String content,
             Group group,
             User user,
+            String files,
+            Integer type,
             Date createdAt
     ) {
         this.id = id;
@@ -46,6 +50,8 @@ public class MessageDataResponse {
         );
         this.user = user;
         this.createdAt = createdAt;
+        this.images = files;
+        this.type = type;
     }
 
     public static List<MessageDataResponse> fromList(List<Message> messages, User currentLoginUser) {
@@ -56,6 +62,8 @@ public class MessageDataResponse {
                     message.getContent(),
                     message.getGroup(),
                     sender,
+                    message.getFiles(),
+                    message.getType(),
                     message.getCreatedAt()
             );
         }).toList();
