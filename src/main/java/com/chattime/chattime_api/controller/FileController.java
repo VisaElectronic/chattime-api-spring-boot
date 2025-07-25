@@ -4,10 +4,7 @@ import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.media.UploadFileResponse;
 import com.chattime.chattime_api.service.FileSystemStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -22,7 +19,8 @@ public class FileController {
 
     @PostMapping("")
     public BaseResponse<List<UploadFileResponse>> updateProfile(
-            @RequestPart("files") List<MultipartFile> files
+            @RequestPart("files") List<MultipartFile> files,
+            @RequestParam(name="m_type", required = false) Integer m_type
     ) {
         List<UploadFileResponse> fileSources = new ArrayList<>(List.of());
         if (files != null) {
@@ -32,7 +30,8 @@ public class FileController {
                         path,
                         f.getOriginalFilename(),
                         f.getContentType(),
-                        f.getSize()
+                        f.getSize(),
+                        m_type
                 );
                 fileSources.add(source);
             }
