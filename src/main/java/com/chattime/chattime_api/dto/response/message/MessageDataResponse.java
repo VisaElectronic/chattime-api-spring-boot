@@ -19,8 +19,9 @@ public class MessageDataResponse {
     private Date createdAt;
     private GroupDataResponse group;
     private User user;
-    private String images;
+    private String files;
     private Integer type;
+    private String audio;
 
     public MessageDataResponse() {
     }
@@ -31,6 +32,7 @@ public class MessageDataResponse {
             Group group,
             User user,
             String files,
+            String audio,
             Integer type,
             Date createdAt
     ) {
@@ -50,8 +52,9 @@ public class MessageDataResponse {
         );
         this.user = user;
         this.createdAt = createdAt;
-        this.images = files;
+        this.files = files;
         this.type = type;
+        this.audio = audio;
     }
 
     public static List<MessageDataResponse> fromList(List<Message> messages, User currentLoginUser) {
@@ -62,7 +65,8 @@ public class MessageDataResponse {
                     message.getContent(),
                     message.getGroup(),
                     sender,
-                    message.getFiles(),
+                    !Objects.equals(message.getType(), Message.VOICE_CHAT) ? message.getFiles() : null,
+                    Objects.equals(message.getType(), Message.VOICE_CHAT) ? message.getFiles() : null,
                     message.getType(),
                     message.getCreatedAt()
             );

@@ -18,6 +18,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<BaseResponse<String>> handleIOException(IOException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     // Add more exception handlers as needed
 
     @ExceptionHandler(Exception.class)

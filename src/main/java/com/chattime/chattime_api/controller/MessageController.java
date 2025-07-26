@@ -82,7 +82,8 @@ public class MessageController {
                 message.getContent(),
                 group,
                 user,
-                message.getFiles(),
+                !Objects.equals(message.getType(), Message.VOICE_CHAT) ? message.getFiles() : null,
+                Objects.equals(message.getType(), Message.VOICE_CHAT) ? message.getFiles() : null,
                 message.getType(),
                 message.getCreatedAt()
         ));

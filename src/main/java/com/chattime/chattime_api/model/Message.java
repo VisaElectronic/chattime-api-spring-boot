@@ -27,6 +27,8 @@ public class Message {
     @Column(name = "type")
     private Integer type;
 
+    public static final Integer VOICE_CHAT = 4;
+
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
