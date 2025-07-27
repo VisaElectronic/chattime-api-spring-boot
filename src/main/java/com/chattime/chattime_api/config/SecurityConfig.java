@@ -34,6 +34,38 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
 
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/login", config);
+        source.registerCorsConfiguration("/logout", config);
+        source.registerCorsConfiguration("/register", config);
+        source.registerCorsConfiguration("/api/**", config);
+        return source;
+    }
+
+    @Bean
+    @Order(0)
+    public SecurityFilterChain publicEndPoints(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/uploads/**", "/ws", "/login", "/register")
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(
+                        request -> request
+                                .anyRequest().permitAll()
+                )
+                .build();
+    }
+
+    @Bean
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .csrf(AbstractHttpConfigurer::disable)
@@ -41,14 +73,7 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(
                 request -> request
-                        .requestMatchers(
-                                "/uploads/**",
-                                "/ws",
-                                "/login",
-                                "/register"
-                        )
-                        .permitAll()
-                        .requestMatchers("/**").authenticated()
+                        .anyRequest().authenticated()
             )
             .logout((logout) -> logout.logoutUrl("logout"))
             .sessionManagement(
@@ -64,23 +89,6 @@ public class SecurityConfig {
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
         provider.setUserDetailsService(userDetailsService);
         return provider;
-    }
-
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/login", config);
-        source.registerCorsConfiguration("/logout", config);
-        source.registerCorsConfiguration("/register", config);
-        source.registerCorsConfiguration("/api/**", config);
-        return source;
     }
 
     @Bean
