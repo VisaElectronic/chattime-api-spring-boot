@@ -47,6 +47,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/logout", config);
         source.registerCorsConfiguration("/register", config);
         source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/uploads/**", config);
         return source;
     }
 
