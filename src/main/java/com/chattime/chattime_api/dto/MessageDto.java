@@ -22,8 +22,4 @@ public class MessageDto {
         this.type = type;
         this.files = files;
     }
-
-    public String getContent() {
-        return content == null ? "" : content;
-    }
 }
