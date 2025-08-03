@@ -16,6 +16,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -40,7 +41,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/channel");
+        // Configure a TaskScheduler for heartbeats
+        ThreadPoolTaskScheduler heartbeatScheduler = new ThreadPoolTaskScheduler();
+        heartbeatScheduler.setPoolSize(1); // Usually 1 is enough for heartbeats
+        heartbeatScheduler.setThreadNamePrefix("ws-heartbeat-scheduler-");
+        heartbeatScheduler.initialize();
+
+        config.enableSimpleBroker("/channel")
+                .setHeartbeatValue(new long[]{10000, 20000}) // Server pings every 10s, expects client pong within 20s
+                .setTaskScheduler(heartbeatScheduler); // Assign the scheduler
         config.setApplicationDestinationPrefixes("/app");
     }
 

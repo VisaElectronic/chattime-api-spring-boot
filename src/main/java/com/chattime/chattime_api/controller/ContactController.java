@@ -40,6 +40,9 @@ public class ContactController {
     public BaseResponse<Object> create(@RequestBody AddContactDto addContactDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
+        if(addContactDto.getPhoneNumber() == null) {
+            return new BaseResponse<>(false, "Invalid Phone Number.");
+        }
         User user = userService.findByPhone(addContactDto.getPhoneNumber());
         if(user == null) {
             return new BaseResponse<>(false, "The person with this phone number is not registered on App yet.");

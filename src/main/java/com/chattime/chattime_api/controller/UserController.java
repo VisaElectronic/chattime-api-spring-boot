@@ -89,8 +89,8 @@ public class UserController {
         @RequestPart(name="avatar", required = false) List<MultipartFile> avatars,
         @RequestPart("firstname") String firstname,
         @RequestPart("lastname") String lastname,
-        @RequestPart("bio") String bio,
-        @RequestPart("dob") String dob
+        @RequestPart(name="bio", required = false) String bio,
+        @RequestPart(name="dob", required = false) String dob
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = ((UserPrincipal) authentication.getPrincipal()).getUser();
