@@ -6,7 +6,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ConnectChatDto {
-    private int limit = 30;
+    private int limit = 10;
     private int offset = 0;
 
     public ConnectChatDto(
