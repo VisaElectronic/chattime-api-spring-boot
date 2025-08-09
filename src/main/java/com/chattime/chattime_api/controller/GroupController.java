@@ -68,7 +68,9 @@ public class GroupController {
             group.getStatus(),
             group.isGroup(),
             null,
-            channelMaps
+            channelMaps,
+            0,
+            null
         ));
     }
 
@@ -135,7 +137,9 @@ public class GroupController {
                 group.getStatus(),
                 group.isGroup(),
                 null,
-                channelMaps
+                channelMaps,
+                0,
+                null
         ));
     }
 

@@ -48,6 +48,8 @@ public class MessageDataResponse {
                 group.getStatus(),
                 group.isGroup(),
                 null,
+                null,
+                0,
                 null
         );
         this.user = user;

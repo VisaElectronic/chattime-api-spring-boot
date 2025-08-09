@@ -1,10 +1,12 @@
 package com.chattime.chattime_api.service;
 
-import com.chattime.chattime_api.model.Channel;
-import com.chattime.chattime_api.model.Group;
-import com.chattime.chattime_api.model.User;
+import com.chattime.chattime_api.dto.response.channel.ChannelData;
+import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
+import com.chattime.chattime_api.model.*;
 import com.chattime.chattime_api.repository.ChannelRepository;
+import com.chattime.chattime_api.repository.GroupChannelRepository;
 import com.chattime.chattime_api.repository.GroupRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +24,9 @@ public class GroupService {
 
     @Autowired
     private FileSystemStorageService storage;
+
+    @Autowired
+    private GroupChannelRepository groupChannelRepository;
 
     public Group findByKey(String key) {
         return groupRepository.findByKey(key);
@@ -144,5 +149,94 @@ public class GroupService {
     public void removeChannel(Group group, Channel channel) {
         group.removeChannel(channel);
         groupRepository.save(group);
+    }
+
+    public void updateGroupLastMessage(Message lastMessage, Group group) {
+        group.setLastMessage(lastMessage);
+        groupRepository.save(group);
+    }
+
+    public Integer getUnReadByChannel(Group group, Channel channel) {
+        GroupChannel groupChannel = groupChannelRepository.findByGroupAndChannel(group, channel);
+        return groupChannel.getUnread() != null ? groupChannel.getUnread() : 0;
+    }
+
+    public List<GroupDataResponse> fromList(
+            List<Group> groups,
+            Channel channel,
+            User currentUser
+    ) {
+        return groups.stream().map(group -> {
+            Set<Channel> channels = group.getChannels();
+            List<ChannelData> channelDTOs = List.of();
+            ChannelData recipientChannel = null;
+            if(!group.isGroup()) {
+                recipientChannel = channels.stream()
+                        .map(ch -> new ChannelData(
+                                ch.getId(),
+                                ch.getKey(),
+                                ch.getName(),
+                                ch.getUser()
+                        ))
+                        .filter(item -> !item.getKey().equals(currentUser.getKey()))
+                        .findFirst()
+                        .orElseThrow(() -> new NoSuchElementException(
+                                "No recipient channel found for user " + currentUser.getKey()
+                        ));
+            }
+            Message lastMessage = group.getLastMessage();
+            Integer unread = this.getUnReadByChannel(group, channel);
+            return new GroupDataResponse(
+                    group.getId(),
+                    group.getName(),
+                    group.getCustomFirstname(),
+                    group.getCustomLastname(),
+                    group.getPhoto(),
+                    group.getKey(),
+                    group.getStatus(),
+                    group.isGroup(),
+                    recipientChannel,
+                    channelDTOs,
+                    unread,
+                    lastMessage
+            );
+        }).toList();
+    }
+
+    public List<GroupDataResponse> getGroupData(
+            Group group,
+            Set<Channel> channels,
+            Channel channel
+    ) {
+        ChannelData recipientChannel = null;
+        if(!group.isGroup()) {
+            recipientChannel = channels.stream()
+                    .map(ch -> new ChannelData(
+                            ch.getId(),
+                            ch.getKey(),
+                            ch.getName(),
+                            ch.getUser()
+                    ))
+                    .filter(item -> !item.getKey().equals(channel.getKey()))
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException(
+                            "No recipient channel found for user " + channel.getKey()
+                    ));
+        }
+        Integer unread = this.getUnReadByChannel(group, channel);
+        return List.of(new GroupDataResponse(
+                group.getId(),
+                group.getName(),
+                group.getCustomFirstname(),
+                group.getCustomLastname(),
+                group.getPhoto(),
+                group.getKey(),
+                group.getStatus(),
+                group.isGroup(),
+                recipientChannel,
+                List.of(),
+                unread,
+                null
+        ));
     }
 }

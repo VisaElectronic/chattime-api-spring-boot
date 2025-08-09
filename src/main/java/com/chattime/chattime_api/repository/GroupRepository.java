@@ -1,8 +1,6 @@
 package com.chattime.chattime_api.repository;
 
-import com.chattime.chattime_api.model.Channel;
 import com.chattime.chattime_api.model.Group;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

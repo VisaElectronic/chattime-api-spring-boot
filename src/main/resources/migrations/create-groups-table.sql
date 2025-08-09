@@ -7,6 +7,8 @@ CREATE TABLE groups (
     photo TEXT,
     status SMALLINT DEFAULT 0,
     is_group SMALLINT DEFAULT 0,
+    last_message_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_last_message_id FOREIGN KEY (last_message_id) REFERENCES messages(id)
 );

@@ -61,15 +61,20 @@ public class MessageController {
                 messageDto.getFiles()
             )
         );
+        groupService.updateGroupLastMessage(message, group);
 
         Set<Channel> channels = group.getChannels();
-
         for (Channel channel : channels) {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
+                Integer unread = channelService.incrementUnRead(group, channel);
                 /* Send To Online Channel For Loading The Channel To Left Side-Bar */
                 ChannelOnlineResponse notifyGroup = new ChannelOnlineResponse(
                     "NOTIFY_GROUP",
-                        GroupDataResponse.from(group, channel.getUser(), channels.stream().toList())
+                        groupService.getGroupData(
+                            group,
+                            channels,
+                            channel
+                        )
                 );
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
                     new BaseResponse<>(true, notifyGroup)
@@ -121,9 +126,10 @@ public class MessageController {
             StompHeaderAccessor headerAccessor
     ) {
         User user = messageService.getUserFromSocketConnection(headerAccessor);
+        Channel channel = channelService.findByKey(user.getKey());
         channelService.create(user_key, user.getUsername(), user);
         List<Group> groups = groupService.findAllByUserKey(user.getKey(), user);
-        return new BaseResponse<>(true, new ChannelOnlineResponse("LIST_GROUPS", GroupDataResponse.fromList(groups, user)));
+        return new BaseResponse<>(true, new ChannelOnlineResponse("LIST_GROUPS", groupService.fromList(groups, channel, user)));
     }
 
     @MessageMapping("/channel/{group_id}/chat/connect")
@@ -140,7 +146,6 @@ public class MessageController {
         int page   = offset / limit;
         Pageable pg = PageRequest.of(page, limit, Sort.by("createdAt").descending());
         List<Message> messages = messageService.getMessagesByGroup(group, pg);
-//        Collections.reverse(messages);
         return new BaseResponse<>(true, MessageDataResponse.fromList(messages, user));
     }
 }

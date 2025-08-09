@@ -28,15 +28,35 @@ public class GroupChannel {
     @Column(nullable = true)
     private int role;
 
+    @ManyToOne()
+    @JoinColumn(name = "last_message_id", referencedColumnName = "id")
+    private Message lastMessage;
+
+    @Column(nullable = true)
+    private Integer unread;
+
+    @Column(nullable = true)
+    private Integer displayOrder;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     protected GroupChannel() { }
 
-    public GroupChannel(Group group, Channel channel, int role) {
+    public GroupChannel(
+            Group group,
+            Channel channel,
+            Message lastMessage,
+            Integer unread,
+            Integer order,
+            int role
+    ) {
         this.group = group;
         this.channel = channel;
         this.role = role;
+        this.lastMessage = lastMessage;
+        this.unread = unread;
+        this.displayOrder = order;
     }
 }
 

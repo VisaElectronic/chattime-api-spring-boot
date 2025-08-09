@@ -1,5 +1,6 @@
 package com.chattime.chattime_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class Message {
     private Long id;
     private String content;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "group_id", referencedColumnName = "id")
     private Group group;
@@ -29,6 +31,7 @@ public class Message {
 
     public static final Integer VOICE_CHAT = 4;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;

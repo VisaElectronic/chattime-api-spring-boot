@@ -2,9 +2,12 @@ package com.chattime.chattime_api.dto.response.channel;
 
 import com.chattime.chattime_api.model.Channel;
 import com.chattime.chattime_api.model.Group;
+import com.chattime.chattime_api.model.Message;
 import com.chattime.chattime_api.model.User;
+import com.chattime.chattime_api.service.GroupService;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -21,6 +24,8 @@ public class GroupDataResponse {
     private boolean isGroup;
     private ChannelData channel;
     private List<ChannelData> channels;
+    private int unread;
+    private Message lastMessage;
 
     public GroupDataResponse(
             Long id,
@@ -32,7 +37,9 @@ public class GroupDataResponse {
             int status,
             boolean isGroup,
             ChannelData channel,
-            List<ChannelData> channels
+            List<ChannelData> channels,
+            int unread,
+            Message lastMessage
     ) {
         this.id = id;
         this.name = name;
@@ -44,85 +51,8 @@ public class GroupDataResponse {
         this.isGroup = isGroup;
         this.channel = channel;
         this.channels = channels;
-    }
-
-    public static List<GroupDataResponse> fromList(List<Group> groups, User currentUser) {
-        return groups.stream().map(group -> {
-            Set<Channel> channels = group.getChannels();
-            List<ChannelData> channelDtos = channels.stream()
-                    .map(ch -> new ChannelData(
-                            ch.getId(),
-                            ch.getKey(),
-                            ch.getName(),
-                            ch.getUser()
-                    ))
-                    .toList();
-            ChannelData recipientChannel = null;
-            if(!group.isGroup()) {
-                recipientChannel = channels.stream()
-                    .map(ch -> new ChannelData(
-                            ch.getId(),
-                            ch.getKey(),
-                            ch.getName(),
-                            ch.getUser()
-                    ))
-                    .filter(item -> !item.getKey().equals(currentUser.getKey()))
-                    .findFirst()
-                    .orElseThrow(() -> new NoSuchElementException(
-                            "No recipient channel found for user " + currentUser.getKey()
-                    ));
-            }
-            return new GroupDataResponse(
-                    group.getId(),
-                    group.getName(),
-                    group.getCustomFirstname(),
-                    group.getCustomLastname(),
-                    group.getPhoto(),
-                    group.getKey(),
-                    group.getStatus(),
-                    group.isGroup(),
-                    recipientChannel,
-                    channelDtos
-            );
-        }).toList();
-    }
-
-    public static List<GroupDataResponse> from(Group group, User currentUser, List<Channel> channels) {
-        ChannelData recipientChannel = null;
-        List<ChannelData> channelDtos = channels.stream()
-                .map(ch -> new ChannelData(
-                        ch.getId(),
-                        ch.getKey(),
-                        ch.getName(),
-                        ch.getUser()
-                ))
-                .toList();
-        if(!group.isGroup()) {
-            recipientChannel = channels.stream()
-                    .map(ch -> new ChannelData(
-                            ch.getId(),
-                            ch.getKey(),
-                            ch.getName(),
-                            ch.getUser()
-                    ))
-                    .filter(item -> !item.getKey().equals(currentUser.getKey()))
-                    .findFirst()
-                    .orElseThrow(() -> new NoSuchElementException(
-                            "No recipient channel found for user " + currentUser.getKey()
-                    ));
-        }
-        return List.of(new GroupDataResponse(
-                group.getId(),
-                group.getName(),
-                group.getCustomFirstname(),
-                group.getCustomLastname(),
-                group.getPhoto(),
-                group.getKey(),
-                group.getStatus(),
-                group.isGroup(),
-                null,
-                channelDtos
-        ));
+        this.unread = unread;
+        this.lastMessage = lastMessage;
     }
 
 }

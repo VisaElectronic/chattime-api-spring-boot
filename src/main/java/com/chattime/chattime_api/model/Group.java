@@ -1,8 +1,11 @@
 package com.chattime.chattime_api.model;
 
+import com.chattime.chattime_api.repository.GroupChannelRepository;
+import com.chattime.chattime_api.service.GroupService;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -37,6 +40,10 @@ public class Group {
     )
     private Set<Channel> channels;
 
+    @ManyToOne()
+    @JoinColumn(name = "last_message_id", referencedColumnName = "id")
+    private Message lastMessage;
+
     @Column(name = "created_at")
     private Date createdAt;
 
@@ -51,7 +58,7 @@ public class Group {
     private Set<GroupChannel> members = new HashSet<>();
 
     public void addChannel(Channel channel, int role) {
-        GroupChannel gc = new GroupChannel(this, channel, role);
+        GroupChannel gc = new GroupChannel(this, channel, null, null, null, role);
         members.add(gc);
     }
 

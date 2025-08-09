@@ -1,8 +1,8 @@
 package com.chattime.chattime_api.service;
 
-import com.chattime.chattime_api.model.Channel;
-import com.chattime.chattime_api.model.User;
+import com.chattime.chattime_api.model.*;
 import com.chattime.chattime_api.repository.ChannelRepository;
+import com.chattime.chattime_api.repository.GroupChannelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +12,9 @@ import java.util.List;
 public class ChannelService {
     @Autowired
     private ChannelRepository channelRepository;
+
+    @Autowired
+    private GroupChannelRepository groupChannelRepository;
 
     public Channel findByKey(String key) {
         return channelRepository.findByKey(key);
@@ -42,4 +45,12 @@ public class ChannelService {
     }
 
     public List<Channel> findAllNotInGroup(String key) {return channelRepository.findAllNotInGroup(key);}
+
+    public Integer incrementUnRead(Group group, Channel channel) {
+        GroupChannel groupChannel = groupChannelRepository.findByGroupAndChannel(group, channel);
+        int unread = (groupChannel.getUnread() != null ? groupChannel.getUnread() : 0) + 1;
+        groupChannel.setUnread(unread);
+        groupChannelRepository.save(groupChannel);
+        return unread;
+    }
 }

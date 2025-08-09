@@ -93,7 +93,9 @@ public class ContactController {
                     channel1.getName(),
                     channel1.getUser()
                 ),
-                channels
+                channels,
+                0,
+                null
         ));
     }
 
@@ -120,6 +122,6 @@ public class ContactController {
         Channel channel = channelService.findByKey(currentUser.getKey());
         List<Group> groups = groupService.findAllByUserKey(channel.getKey(), currentUser);
 
-        return new BaseResponse<>(true, GroupDataResponse.fromList(groups, currentUser));
+        return new BaseResponse<>(true, groupService.fromList(groups, channel, currentUser));
     }
 }
