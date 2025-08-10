@@ -1,7 +1,6 @@
 package com.chattime.chattime_api.repository;
 
 import com.chattime.chattime_api.model.Channel;
-import com.chattime.chattime_api.model.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,4 +35,7 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
       )
     """)
     List<Channel> findAllNotInGroup(@Param("key") String key);
+
+    @Query("SELECT c FROM Channel c JOIN c.groups g ON g.id = :groupId")
+    List<Channel> findAllByGroupId(@Param("groupId") Long groupId);
 }

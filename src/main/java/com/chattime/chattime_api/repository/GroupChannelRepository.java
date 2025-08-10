@@ -25,28 +25,19 @@ public interface GroupChannelRepository extends JpaRepository<GroupChannel, Long
      */
     GroupChannel findByGroupAndChannel(Group group, Channel channel);
 
-    /**
-     * Updates the last message ID and increments the unread count for a specific group-channel entry.
-     *
-     * @param lastMessage The ID of the new last message.
-     * @param group The ID of the group.
-     * @param channel The ID of the channel.
-     * @return The number of entities updated.
-     */
     @Modifying
-    @Transactional
-    @Query("UPDATE GroupChannel gc SET gc.lastMessage = :lastMessage, gc.unread = gc.unread + 1 " +
-            "WHERE gc.group = :group AND gc.channel = :channel")
-    int updateGroupChannel(@Param("lastMessage") Message lastMessage,
-                                            @Param("group") Group group,
-                                            @Param("channel") Channel channel);
-
-    @Modifying
-    @Query("update GroupChannel gc set gc.displayOrder = gc.displayOrder + ?3 where gc.displayOrder >= ?1 and gc.displayOrder <= ?2" +
-            "WHERE gc.group = :group AND gc.channel = :channel")
+    @Query("update GroupChannel gc set gc.displayOrder = gc.displayOrder + :shift " +
+            "where gc.displayOrder >= :start and gc.displayOrder <= :end and gc.channel = :channel")
     void updateDisplayOrderInBatch(
-        @Param("group") Group group,
         @Param("channel") Channel channel,
-        int start, int end, int shift
+        @Param("start") int start,
+        @Param("end") int end,
+        @Param("shift") int shift
+    );
+
+    @Query("SELECT MAX(gc.displayOrder) FROM GroupChannel gc " +
+            "WHERE gc.channel = :channel")
+    Integer findMaxDisplayOrder(
+            @Param("channel") Channel channel
     );
 }

@@ -45,12 +45,4 @@ public class ChannelService {
     }
 
     public List<Channel> findAllNotInGroup(String key) {return channelRepository.findAllNotInGroup(key);}
-
-    public Integer incrementUnRead(Group group, Channel channel) {
-        GroupChannel groupChannel = groupChannelRepository.findByGroupAndChannel(group, channel);
-        int unread = (groupChannel.getUnread() != null ? groupChannel.getUnread() : 0) + 1;
-        groupChannel.setUnread(unread);
-        groupChannelRepository.save(groupChannel);
-        return unread;
-    }
 }

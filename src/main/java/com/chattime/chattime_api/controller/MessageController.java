@@ -3,7 +3,6 @@ package com.chattime.chattime_api.controller;
 import com.chattime.chattime_api.dto.MessageDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.channel.ChannelOnlineResponse;
-import com.chattime.chattime_api.dto.response.channel.GroupDataResponse;
 import com.chattime.chattime_api.dto.response.message.MessageDataResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
 import com.chattime.chattime_api.dto.socket.ConnectChatDto;
@@ -18,13 +17,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import com.chattime.chattime_api.service.MessageService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -40,9 +37,6 @@ public class MessageController {
 
     @Autowired
     private GroupService groupService;
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/channel/{group_id}/chat")
     @SendTo("/channel/{group_id}/chat")
@@ -66,19 +60,16 @@ public class MessageController {
         Set<Channel> channels = group.getChannels();
         for (Channel channel : channels) {
             if (!Objects.equals(channel.getKey(), user.getKey())) {
-                Integer unread = channelService.incrementUnRead(group, channel);
+                Integer unread = groupService.incrementUnRead(group, channel);
+                groupService.reorderGroupChannel(group, channel);
                 /* Send To Online Channel For Loading The Channel To Left Side-Bar */
-                ChannelOnlineResponse notifyGroup = new ChannelOnlineResponse(
-                    "NOTIFY_GROUP",
-                        groupService.getGroupData(
-                            group,
-                            channels,
-                            channel,
-                            unread
-                        )
-                );
-                messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
-                    new BaseResponse<>(true, notifyGroup)
+                groupService.notifyGroupAsync(
+                        "NOTIFY_GROUP",
+                        group,
+                        channel,
+                        channels,
+                        unread,
+                        message
                 );
             }
         }

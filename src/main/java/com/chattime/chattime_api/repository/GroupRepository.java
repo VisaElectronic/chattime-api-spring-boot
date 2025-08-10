@@ -23,8 +23,8 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     """)
     List<Group> findGroupsContainingKeys(@Param("keys") List<String> keys, int isGroup);
 
-    @Query("SELECT g FROM Group g JOIN g.channels c WHERE c.key = :key")
-    List<Group> findByChannelsKey(@Param("key") String key);
+    @Query("SELECT gc.group FROM GroupChannel gc WHERE gc.channel.key = :key ORDER BY gc.displayOrder DESC")
+    List<Group> findByChannelKeyOrderByDisplayOrder(@Param("key") String key);
 
     @Query("SELECT g FROM Group g JOIN g.channels c JOIN FETCH g.channels WHERE c.key = :key")
     List<Group> findByChannelsKeyAndFetchChannels(@Param("key") String key);

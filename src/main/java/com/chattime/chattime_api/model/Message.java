@@ -31,7 +31,6 @@ public class Message {
 
     public static final Integer VOICE_CHAT = 4;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     private User createdBy;
