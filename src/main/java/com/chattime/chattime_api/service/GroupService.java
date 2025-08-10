@@ -206,7 +206,8 @@ public class GroupService {
     public List<GroupDataResponse> getGroupData(
             Group group,
             Set<Channel> channels,
-            Channel channel
+            Channel channel,
+            Integer unread
     ) {
         ChannelData recipientChannel = null;
         if(!group.isGroup()) {
@@ -223,7 +224,7 @@ public class GroupService {
                             "No recipient channel found for user " + channel.getKey()
                     ));
         }
-        Integer unread = this.getUnReadByChannel(group, channel);
+        Message lastMessage = group.getLastMessage();
         return List.of(new GroupDataResponse(
                 group.getId(),
                 group.getName(),
@@ -236,7 +237,7 @@ public class GroupService {
                 recipientChannel,
                 List.of(),
                 unread,
-                null
+                lastMessage
         ));
     }
 }

@@ -73,7 +73,8 @@ public class MessageController {
                         groupService.getGroupData(
                             group,
                             channels,
-                            channel
+                            channel,
+                            unread
                         )
                 );
                 messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",

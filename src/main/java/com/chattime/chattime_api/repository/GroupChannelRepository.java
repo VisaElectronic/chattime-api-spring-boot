@@ -40,4 +40,13 @@ public interface GroupChannelRepository extends JpaRepository<GroupChannel, Long
     int updateGroupChannel(@Param("lastMessage") Message lastMessage,
                                             @Param("group") Group group,
                                             @Param("channel") Channel channel);
+
+    @Modifying
+    @Query("update GroupChannel gc set gc.displayOrder = gc.displayOrder + ?3 where gc.displayOrder >= ?1 and gc.displayOrder <= ?2" +
+            "WHERE gc.group = :group AND gc.channel = :channel")
+    void updateDisplayOrderInBatch(
+        @Param("group") Group group,
+        @Param("channel") Channel channel,
+        int start, int end, int shift
+    );
 }
