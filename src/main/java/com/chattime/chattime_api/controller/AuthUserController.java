@@ -1,13 +1,17 @@
 package com.chattime.chattime_api.controller;
 
 import com.chattime.chattime_api.dto.UserDto;
+import com.chattime.chattime_api.dto.auth.LoginDto;
+import com.chattime.chattime_api.dto.auth.RegisterDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.login.LoginDataResponse;
 import com.chattime.chattime_api.dto.response.login.LoginResponse;
 import com.chattime.chattime_api.dto.response.register.RegisterDataResponse;
 import com.chattime.chattime_api.dto.response.register.RegisterResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
+import com.chattime.chattime_api.model.Otp;
 import com.chattime.chattime_api.model.User;
+import com.chattime.chattime_api.service.OtpService;
 import com.chattime.chattime_api.service.UserService;
 import com.chattime.chattime_api.service.UtilService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class AuthUserController {
@@ -34,27 +35,31 @@ public class AuthUserController {
     @Autowired
     private UtilService utilService;
 
+    @Autowired
+    private OtpService otpService;
+
     @PostMapping("/register")
-    public RegisterResponse register(
+    public BaseResponse<Object> register(
         @RequestParam("firstname") String firstname,
         @RequestParam("lastname") String lastname,
         @RequestParam("email") String email,
         @RequestParam("phone") String phone,
         @RequestParam("password") String password
     ) {
-        UserDto userDto = new UserDto(firstname.toLowerCase(), firstname, lastname, email, phone, password);
-        User user = userService.register(userDto);
-        return new RegisterResponse(true, new RegisterDataResponse(
-            user.getId(),
-            user.getUsername(),
-            user.getEmail())
+        RegisterDto userDto = new RegisterDto(firstname.toLowerCase(), firstname, lastname, email, phone, null);
+        UUID identifier = UUID.randomUUID();
+        String otpCode = otpService.generateOtp(identifier.toString(), Otp.TYPE_REGISTER, 15);
+        userDto.setOtp(otpCode);
+        userService.sendOTPVerification(userDto);
+        return new BaseResponse<>(true, "OTP Code has been send to your email address."
         );
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody UserDto userDto) {
-        User user = userService.findByEmail(userDto.getEmail());
-        String access_token = userService.verify(userDto, user);
+    public BaseResponse<Object> login(@RequestBody LoginDto loginDto) {
+        User user = userService.findByEmail(loginDto.getEmail());
+        if(user == null) return new BaseResponse<>(false, "Invalid credentials");
+        String access_token = userService.verify(loginDto, user);
         ProfileDataResponse profile = new ProfileDataResponse(
                 user.getId(),
                 user.getUsername(),
@@ -68,7 +73,7 @@ public class AuthUserController {
                 user.getBio()
         );
         LoginDataResponse loginDataResponse = new LoginDataResponse(access_token, profile);
-        return new LoginResponse(true, loginDataResponse);
+        return new BaseResponse<>(true, loginDataResponse);
     }
 
     @PostMapping("/logout")

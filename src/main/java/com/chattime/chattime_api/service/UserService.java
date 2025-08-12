@@ -1,17 +1,33 @@
 package com.chattime.chattime_api.service;
 
 import com.chattime.chattime_api.dto.UserDto;
+import com.chattime.chattime_api.dto.auth.LoginDto;
+import com.chattime.chattime_api.dto.auth.RegisterDto;
 import com.chattime.chattime_api.dto.request.ProfileUpdateDto;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +44,22 @@ public class UserService {
 
     @Autowired
     private FileSystemStorageService storage;
-    // ...
+
+    @Value("${admin.api.url}")
+    private String adminApiUrl;
+
+    @Value("${app.request.secret}")
+    private String appRequestSecret;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public User register(UserDto userDto) {
         User user = new User(
@@ -44,9 +73,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String verify(UserDto userDto, User user) {
+    public String verify(LoginDto loginDto, User user) {
         Authentication authentication =
-                authManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
+                authManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
         if(authentication.isAuthenticated()) {
             return jwtService.generateToken(user);
         }
@@ -104,5 +133,51 @@ public class UserService {
         if(avatarFilename != null) user.setAvatar(avatarFilename);
 
         return userRepository.save(user);
+    }
+
+    @Async
+    public void sendOTPVerification(RegisterDto data) {
+        try {
+            // 1. Convert the data object to a JSON string (raw request body)
+            String jsonBody = objectMapper.writeValueAsString(data);
+
+            // 2. Calculate the HMAC-SHA256 hash of the JSON body
+            String hash = calculateHmacSha256(jsonBody, appRequestSecret);
+
+            // 3. Prepare headers for the outgoing request to Laravel
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-Signed-Key", hash); // Set the custom header for Laravel to verify
+
+            // 4. Create the HTTP entity (body + headers)
+            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+
+            // 5. Send the POST request to the Laravel API
+            ResponseEntity<String> response = restTemplate.exchange(
+                    adminApiUrl + "/api/v1/send-registration-verify",
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+            logger.info(response.toString());
+
+        } catch (Exception ex) {
+            logger.error(ex.toString());
+        }
+    }
+
+    private String calculateHmacSha256(String data, String key)
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        sha256_HMAC.init(secret_key);
+        byte[] hashedBytes = sha256_HMAC.doFinal(data.getBytes(StandardCharsets.UTF_8));
+
+        // Convert byte array to a hex string for comparison with Laravel's hash_hmac default output
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hashedBytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }
