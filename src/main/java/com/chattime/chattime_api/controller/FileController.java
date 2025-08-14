@@ -36,6 +36,6 @@ public class FileController {
                 fileSources.add(source);
             }
         }
-        return new BaseResponse<List<UploadFileResponse>>(true, fileSources);
+        return new BaseResponse<List<UploadFileResponse>>(true, null, fileSources);
     }
 }

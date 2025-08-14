@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<BaseResponse<String>> handleRuntimeException(RuntimeException ex, WebRequest request) {
-        BaseResponse<String> response = new BaseResponse<>(false, ex.getMessage());
+        BaseResponse<String> response = new BaseResponse<>(false, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<String>> handleGlobalException(Exception ex, WebRequest request) {
-        BaseResponse<String> response = new BaseResponse<>(false, "An unexpected error occurred: " + ex.getMessage());
+        BaseResponse<String> response = new BaseResponse<>(false, "An unexpected error occurred: " + ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

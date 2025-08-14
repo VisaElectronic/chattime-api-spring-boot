@@ -1,10 +1,12 @@
 package com.chattime.chattime_api.dto.response.media;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class UploadFileResponse {
     private String uri;
     private String name;

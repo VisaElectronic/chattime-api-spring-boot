@@ -1,13 +1,11 @@
 package com.chattime.chattime_api.controller;
 
-import com.chattime.chattime_api.dto.UserDto;
 import com.chattime.chattime_api.dto.auth.LoginDto;
 import com.chattime.chattime_api.dto.auth.RegisterDto;
+import com.chattime.chattime_api.dto.auth.VerifyRegisterDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.login.LoginDataResponse;
-import com.chattime.chattime_api.dto.response.login.LoginResponse;
-import com.chattime.chattime_api.dto.response.register.RegisterDataResponse;
-import com.chattime.chattime_api.dto.response.register.RegisterResponse;
+import com.chattime.chattime_api.dto.response.register.RegisterOTPResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
 import com.chattime.chattime_api.model.Otp;
 import com.chattime.chattime_api.model.User;
@@ -15,16 +13,10 @@ import com.chattime.chattime_api.service.OtpService;
 import com.chattime.chattime_api.service.UserService;
 import com.chattime.chattime_api.service.UtilService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 
 @RestController
@@ -43,22 +35,46 @@ public class AuthUserController {
         @RequestParam("firstname") String firstname,
         @RequestParam("lastname") String lastname,
         @RequestParam("email") String email,
-        @RequestParam("phone") String phone,
-        @RequestParam("password") String password
+        @RequestParam("phone") String phone
     ) {
         RegisterDto userDto = new RegisterDto(firstname.toLowerCase(), firstname, lastname, email, phone, null);
         UUID identifier = UUID.randomUUID();
         String otpCode = otpService.generateOtp(identifier.toString(), Otp.TYPE_REGISTER, 15);
         userDto.setOtp(otpCode);
         userService.sendOTPVerification(userDto);
-        return new BaseResponse<>(true, "OTP Code has been send to your email address."
+        return new BaseResponse<>(
+                true,
+                "OTP Code has been send to your email address.",
+                new RegisterOTPResponse(
+                        identifier.toString()
+                )
         );
+    }
+
+    @PostMapping("/register-verify")
+    public BaseResponse<Object> verifyRegister(
+            @RequestParam("firstname") String firstname,
+            @RequestParam("lastname") String lastname,
+            @RequestParam("email") String email,
+            @RequestParam("phone") String phone,
+            @RequestParam("password") String password,
+            @RequestParam("identifier") String identifier,
+            @RequestParam("otpCode") String otpCode
+    ) {
+        VerifyRegisterDto userDto = new VerifyRegisterDto(firstname.toLowerCase(), firstname, lastname, email, phone, password);
+        boolean success = otpService.validateOtp(identifier, otpCode, Otp.TYPE_REGISTER);
+        if(success) {
+            User user = userService.register(userDto);
+        } else {
+            return new BaseResponse<>(false, "Registered Failed, Invalid OTP.", null);
+        }
+        return new BaseResponse<>(true, "Registered Successfully.", null);
     }
 
     @PostMapping("/login")
     public BaseResponse<Object> login(@RequestBody LoginDto loginDto) {
         User user = userService.findByEmail(loginDto.getEmail());
-        if(user == null) return new BaseResponse<>(false, "Invalid credentials");
+        if(user == null) return new BaseResponse<>(false, "Invalid credentials", null);
         String access_token = userService.verify(loginDto, user);
         ProfileDataResponse profile = new ProfileDataResponse(
                 user.getId(),
@@ -73,12 +89,12 @@ public class AuthUserController {
                 user.getBio()
         );
         LoginDataResponse loginDataResponse = new LoginDataResponse(access_token, profile);
-        return new BaseResponse<>(true, loginDataResponse);
+        return new BaseResponse<>(true, null, loginDataResponse);
     }
 
     @PostMapping("/logout")
     public BaseResponse<Boolean> logout() {
-        return new BaseResponse<Boolean>(true, true);
+        return new BaseResponse<Boolean>(true, null, true);
     }
 
     @MessageMapping("/channel/logout")
@@ -89,6 +105,6 @@ public class AuthUserController {
         if (sessionAttrs != null) {
             sessionAttrs.clear();
         }
-        return new BaseResponse<Boolean>(true, true);
+        return new BaseResponse<Boolean>(true, null, true);
     }
 }

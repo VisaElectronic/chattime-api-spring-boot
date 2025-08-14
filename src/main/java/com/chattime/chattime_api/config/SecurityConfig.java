@@ -50,6 +50,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/login", config);
         source.registerCorsConfiguration("/logout", config);
         source.registerCorsConfiguration("/register", config);
+        source.registerCorsConfiguration("/verify-register", config);
         source.registerCorsConfiguration("/api/**", config);
         source.registerCorsConfiguration("/uploads/**", config);
         return source;
@@ -59,7 +60,14 @@ public class SecurityConfig {
     @Order(0)
     public SecurityFilterChain publicEndPoints(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/uploads/**", "/ws", "/login", "/register")
+                .securityMatcher(
+                        "/uploads/**",
+                        "/ws",
+                        "/login",
+                        "/register",
+                        "/register-verify",
+                        "/register-resend-otp"
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(

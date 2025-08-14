@@ -2,6 +2,7 @@ package com.chattime.chattime_api.dto.response.user;
 
 import com.chattime.chattime_api.model.User;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class ProfileDataResponse {
     private Long id;
     private String username;
@@ -19,7 +21,7 @@ public class ProfileDataResponse {
     private String firstname;
     private String lastname;
     private String phone;
-    private LocalDateTime dob;
+    private String dob;
     private String bio;
 
     public ProfileDataResponse(
@@ -42,7 +44,7 @@ public class ProfileDataResponse {
         this.firstname = firstname;
         this.lastname = lastname;
         this.phone = phone;
-        this.dob = dob;
+        this.dob = dob != null ? dob.toString() : null;
         this.bio = bio;
     }
 

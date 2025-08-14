@@ -1,17 +1,13 @@
 package com.chattime.chattime_api.controller;
 
-import com.chattime.chattime_api.dto.UserDto;
 import com.chattime.chattime_api.dto.request.ProfileUpdateDto;
 import com.chattime.chattime_api.dto.response.BaseResponse;
-import com.chattime.chattime_api.dto.response.register.RegisterDataResponse;
-import com.chattime.chattime_api.dto.response.register.RegisterResponse;
 import com.chattime.chattime_api.dto.response.user.ProfileDataResponse;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.model.UserPrincipal;
 import com.chattime.chattime_api.service.UserService;
 import com.chattime.chattime_api.service.UtilService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,7 +37,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = ((UserPrincipal) authentication.getPrincipal()).getUser();
         List<User> users = userService.findAllAndRemoveCurrentUser(user);
-        return new BaseResponse<>(true, ProfileDataResponse.fromList(users));
+        return new BaseResponse<>(true, null, ProfileDataResponse.fromList(users));
     }
 
     @GetMapping("/profile")
@@ -52,7 +48,7 @@ public class UserController {
             email = ((UserDetails) authentication.getPrincipal()).getUsername();
         }
         User user = userService.findByEmail(email);
-        return new BaseResponse<>(true, new ProfileDataResponse(
+        return new BaseResponse<>(true, null, new ProfileDataResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
@@ -103,7 +99,7 @@ public class UserController {
                 dobFormatted
         );
         user = userService.updateProfile(user, dto, avatars);
-        return new BaseResponse<>(true, new ProfileDataResponse(
+        return new BaseResponse<>(true, null, new ProfileDataResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),

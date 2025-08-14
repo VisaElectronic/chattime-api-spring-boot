@@ -1,5 +1,10 @@
 package com.chattime.chattime_api.dto.socket;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class ConnectOnlineDto {
     private String userId;
     private String channelId;
@@ -12,19 +17,4 @@ public class ConnectOnlineDto {
         this.channelId = channelId;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
-    }
 }

@@ -1,18 +1,16 @@
 package com.chattime.chattime_api.dto.response.channel;
 
-import com.chattime.chattime_api.model.Channel;
-import com.chattime.chattime_api.model.Group;
 import com.chattime.chattime_api.model.Message;
-import com.chattime.chattime_api.model.User;
-import com.chattime.chattime_api.service.GroupService;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.List;
+
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class GroupDataResponse {
     private Long id;
     private String name;

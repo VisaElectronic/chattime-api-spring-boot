@@ -41,14 +41,14 @@ public class ContactController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
         if(addContactDto.getPhoneNumber() == null) {
-            return new BaseResponse<>(false, "Invalid Phone Number.");
+            return new BaseResponse<>(false, "Invalid Phone Number.", null);
         }
         User user = userService.findByPhone(addContactDto.getPhoneNumber());
         if(user == null) {
-            return new BaseResponse<>(false, "The person with this phone number is not registered on App yet.");
+            return new BaseResponse<>(false, "The person with this phone number is not registered on App yet.", null);
         }
         if(Objects.equals(currentUser.getEmail(), user.getEmail())) {
-            return new BaseResponse<>(false, "You can't add yourself as a contact.");
+            return new BaseResponse<>(false, "You can't add yourself as a contact.", null);
         }
         Channel channel1 = channelService.create(user.getKey(), user.getUsername(), user);
         channel1.setUser(user);
@@ -56,7 +56,7 @@ public class ContactController {
         List<Group> existingGroups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey(), false);
         if (!existingGroups.isEmpty()) {
             Group firstGroup = existingGroups.getFirst();
-            return new BaseResponse<>(false, "You already has a contact with this phone's owner.");
+            return new BaseResponse<>(false, "You already has a contact with this phone's owner.", null);
         }
         String key = UUID.randomUUID().toString();
         Group group = groupService.save(
@@ -78,7 +78,7 @@ public class ContactController {
                 ))
                 .toList();
 
-        return new BaseResponse<>(true, new GroupDataResponse(
+        return new BaseResponse<>(true, null, new GroupDataResponse(
                 group.getId(),
                 group.getName(),
                 group.getCustomFirstname(),
@@ -111,7 +111,7 @@ public class ContactController {
                 .stream()
                 .map(ChannelData::from)
                 .toList();
-        return new BaseResponse<List<ChannelData>>(true, channels);
+        return new BaseResponse<List<ChannelData>>(true, null, channels);
     }
 
     // implement list of channels
@@ -122,6 +122,6 @@ public class ContactController {
         Channel channel = channelService.findByKey(currentUser.getKey());
         List<Group> groups = groupService.findAllByUserKey(channel.getKey(), currentUser);
 
-        return new BaseResponse<>(true, groupService.fromList(groups, channel, currentUser));
+        return new BaseResponse<>(true, null, groupService.fromList(groups, channel, currentUser));
     }
 }

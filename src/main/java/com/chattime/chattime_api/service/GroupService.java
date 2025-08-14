@@ -61,7 +61,7 @@ public class GroupService {
                 )
         );
         messagingTemplate.convertAndSend("/channel/" + channel.getKey() + "/online",
-                new BaseResponse<>(true, notifyGroup)
+                new BaseResponse<>(true, null, notifyGroup)
         );
     }
 

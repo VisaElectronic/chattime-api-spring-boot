@@ -74,7 +74,7 @@ public class MessageController {
             }
         }
 
-        return new BaseResponse<>(true, new MessageDataResponse(
+        return new BaseResponse<>(true, null, new MessageDataResponse(
                 message.getId(),
                 message.getContent(),
                 group,
@@ -93,10 +93,10 @@ public class MessageController {
             StompHeaderAccessor headerAccessor
     ) {
         if(Objects.equals(headerAccessor.getMessageId(), "token_expired")) {
-            return new BaseResponse<>(false, "token_expired");
+            return new BaseResponse<>(false, "token_expired", null);
         }
         User user = messageService.getUserFromSocketConnection(headerAccessor);
-        return new BaseResponse<>(true, new ProfileDataResponse(
+        return new BaseResponse<>(true, null, new ProfileDataResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
@@ -121,7 +121,7 @@ public class MessageController {
         Channel channel = channelService.findByKey(user.getKey());
         channelService.create(user_key, user.getUsername(), user);
         List<Group> groups = groupService.findAllByUserKey(user.getKey(), user);
-        return new BaseResponse<>(true, new ChannelOnlineResponse("LIST_GROUPS", groupService.fromList(groups, channel, user)));
+        return new BaseResponse<>(true, null, new ChannelOnlineResponse("LIST_GROUPS", groupService.fromList(groups, channel, user)));
     }
 
     @MessageMapping("/channel/{group_id}/chat/connect")
@@ -138,6 +138,6 @@ public class MessageController {
         int page   = offset / limit;
         Pageable pg = PageRequest.of(page, limit, Sort.by("createdAt").descending());
         List<Message> messages = messageService.getMessagesByGroup(group, pg);
-        return new BaseResponse<>(true, MessageDataResponse.fromList(messages, user));
+        return new BaseResponse<>(true, null, MessageDataResponse.fromList(messages, user));
     }
 }

@@ -4,12 +4,14 @@ import com.chattime.chattime_api.model.Channel;
 import com.chattime.chattime_api.model.Group;
 import com.chattime.chattime_api.model.User;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ChannelData {
     Long   id;
     String key;

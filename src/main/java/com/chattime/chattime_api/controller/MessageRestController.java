@@ -55,6 +55,6 @@ public class MessageRestController {
                 0,
                 null
         );
-        return new BaseResponse<>(true, MessageDataResponse.fromList(messages, currentUser));
+        return new BaseResponse<>(true, null, MessageDataResponse.fromList(messages, currentUser));
     }
 }

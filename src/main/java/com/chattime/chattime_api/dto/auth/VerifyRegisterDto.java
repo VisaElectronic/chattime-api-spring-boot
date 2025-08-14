@@ -7,27 +7,27 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
-public class RegisterDto {
+public class VerifyRegisterDto {
     private String firstname;
     private String username;
     private String lastname;
     private String phone;
     private String email;
-    private String otp;
+    private String password;
 
-    public RegisterDto(
+    public VerifyRegisterDto(
             String username,
             String firstname,
             String lastname,
             String email,
             String phone,
-            String otp
+            String password
     ) {
         this.username = username;
         this.firstname = firstname;
         this.lastname = lastname;
         this.phone = phone;
         this.email = email;
-        this.otp = otp;
+        this.password = password;
     }
 }

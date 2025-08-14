@@ -6,6 +6,7 @@ import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.service.UserService;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,10 +14,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ChannelMemberData extends ChannelData {
     private Integer role;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @Autowired
     private UserService userService;
@@ -32,7 +34,7 @@ public class ChannelMemberData extends ChannelData {
     ) {
         super(id, key, name, user);
         this.role = role;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt != null ? createdAt.toString() : null;
     }
 
     public static ChannelMemberData fromMember(GroupChannel gc) {

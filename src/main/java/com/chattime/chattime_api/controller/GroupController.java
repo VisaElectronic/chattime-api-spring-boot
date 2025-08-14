@@ -58,7 +58,7 @@ public class GroupController {
                 ))
                 .toList();
 
-        return new BaseResponse<>(true, new GroupDataResponse(
+        return new BaseResponse<>(true, null, new GroupDataResponse(
             group.getId(),
             group.getName(),
             group.getCustomFirstname(),
@@ -94,7 +94,7 @@ public class GroupController {
                     .map(ChannelMemberData::from)
                     .toList();
         }
-        return new BaseResponse<>(true, channels);
+        return new BaseResponse<>(true, null, channels);
     }
 
     @PostMapping("/{key}")
@@ -127,7 +127,7 @@ public class GroupController {
                 ))
                 .toList();
 
-        return new BaseResponse<>(true, new GroupDataResponse(
+        return new BaseResponse<>(true, null, new GroupDataResponse(
                 group.getId(),
                 group.getName(),
                 group.getCustomFirstname(),
@@ -153,6 +153,6 @@ public class GroupController {
         Group group = groupService.findByKey(groupKey);
         Channel channel = channelService.findByKey(channelKey);
         groupService.removeChannel(group, channel);
-        return new BaseResponse<>(true, "User is removed successfully.");
+        return new BaseResponse<>(true, "User is removed successfully.", null);
     }
 }

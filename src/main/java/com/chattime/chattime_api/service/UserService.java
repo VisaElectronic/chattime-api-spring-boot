@@ -3,6 +3,7 @@ package com.chattime.chattime_api.service;
 import com.chattime.chattime_api.dto.UserDto;
 import com.chattime.chattime_api.dto.auth.LoginDto;
 import com.chattime.chattime_api.dto.auth.RegisterDto;
+import com.chattime.chattime_api.dto.auth.VerifyRegisterDto;
 import com.chattime.chattime_api.dto.request.ProfileUpdateDto;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.repository.UserRepository;
@@ -61,7 +62,7 @@ public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public User register(UserDto userDto) {
+    public User register(VerifyRegisterDto userDto) {
         User user = new User(
             userDto.getUsername(),
             userDto.getFirstname(),

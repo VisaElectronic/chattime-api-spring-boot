@@ -28,6 +28,7 @@ public class User {
     private String firstname;
     private String lastname;
     private String phone;
+    @JsonIgnore
     private LocalDateTime dob;
     private String bio;
     @Column(name = "created_at")
