@@ -43,17 +43,28 @@ public class Otp {
     @Column(name = "type", nullable = false)
     private int type; // Type of OTP, e.g., login or registration
 
+    @Column(name = "resend_ref_id")
+    private Long resend_ref_id;
+
     // Default constructor is required by JPA
     public Otp() {
     }
 
     // Constructor with all fields (excluding ID as it's auto-generated)
-    public Otp(String identifier, String token, boolean valid, LocalDateTime validity, int type) {
+    public Otp(
+            String identifier,
+            String token,
+            boolean valid,
+            LocalDateTime validity,
+            Long resendRefId,
+            int type
+    ) {
         this.identifier = identifier;
         this.token = token;
         this.valid = valid;
         this.validity = validity;
         this.type = type;
+        this.resend_ref_id = resendRefId;
     }
 }
 

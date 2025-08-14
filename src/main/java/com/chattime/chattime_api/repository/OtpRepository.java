@@ -23,6 +23,8 @@ public interface OtpRepository extends JpaRepository<Otp, Long> {
      */
     Optional<Otp> findByIdentifierAndTokenAndTypeAndValid(String identifier, String token, int type, boolean valid);
 
+    Optional<Otp> findByIdentifierAndTypeAndValid(String identifier, int type, boolean valid);
+
     /**
      * Finds the latest valid OTP for a given identifier and type.
      * This can be useful when a user requests multiple OTPs, and you only want the most recent active one.

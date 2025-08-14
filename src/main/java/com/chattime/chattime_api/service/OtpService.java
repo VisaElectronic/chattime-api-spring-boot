@@ -33,7 +33,12 @@ public class OtpService {
      * @return The generated OTP token string.
      */
     @Transactional
-    public String generateOtp(String identifier, int otpType, long durationMinutes) {
+    public String generateOtp(
+            String identifier,
+            int otpType,
+            long durationMinutes,
+            Long resendRefId
+    ) {
         // Invalidate any existing valid OTPs for this identifier and type to prevent confusion
         // and enforce that only the latest generated OTP is active.
         otpRepository.findFirstByIdentifierAndTypeAndValidOrderByValidityDesc(identifier, otpType, true)
@@ -53,7 +58,7 @@ public class OtpService {
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(durationMinutes);
 
         // Create and save the new OTP record
-        Otp newOtp = new Otp(identifier, otpToken, true, expiresAt, otpType);
+        Otp newOtp = new Otp(identifier, otpToken, true, expiresAt, resendRefId, otpType);
         otpRepository.save(newOtp);
 
         return otpToken;
@@ -125,6 +130,34 @@ public class OtpService {
         // We can reuse it or define a more general one if needed.
         // For now, let's assume we want to check all valid ones.
         return otpRepository.findByIdentifierAndTokenAndTypeAndValid(identifier, token, otpType, true);
+    }
+
+    @Transactional
+    public String regenerateOtp(
+            String identifier,
+            String newIdentifier,
+            int otpType
+    ) {
+        Optional<Otp> otpOptional = otpRepository.findByIdentifierAndTypeAndValid(identifier, otpType, true);
+
+        if (otpOptional.isPresent()) {
+            Otp otp = otpOptional.get();
+
+            // Check if the OTP has expired
+            if (otp.getValidity().isBefore(LocalDateTime.now())) {
+                otp.setValid(false); // Mark as expired/invalid
+                otpRepository.save(otp);
+                return null;
+            }
+
+            String otpToken = this.generateOtp(newIdentifier, otpType, 15, otp.getId());
+
+            // OTP is valid and not expired, so mark it as used
+            otp.setValid(false);
+            otpRepository.save(otp);
+            return otpToken; // OTP validated successfully
+        }
+        return null; // OTP not found or already invalid
     }
 }
 

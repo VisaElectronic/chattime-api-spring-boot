@@ -50,7 +50,8 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/login", config);
         source.registerCorsConfiguration("/logout", config);
         source.registerCorsConfiguration("/register", config);
-        source.registerCorsConfiguration("/verify-register", config);
+        source.registerCorsConfiguration("/register-verify", config);
+        source.registerCorsConfiguration("/register-resend", config);
         source.registerCorsConfiguration("/api/**", config);
         source.registerCorsConfiguration("/uploads/**", config);
         return source;
@@ -66,7 +67,7 @@ public class SecurityConfig {
                         "/login",
                         "/register",
                         "/register-verify",
-                        "/register-resend-otp"
+                        "/register-resend"
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))

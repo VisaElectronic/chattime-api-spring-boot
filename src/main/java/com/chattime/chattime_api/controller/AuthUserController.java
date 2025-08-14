@@ -39,7 +39,7 @@ public class AuthUserController {
     ) {
         RegisterDto userDto = new RegisterDto(firstname.toLowerCase(), firstname, lastname, email, phone, null);
         UUID identifier = UUID.randomUUID();
-        String otpCode = otpService.generateOtp(identifier.toString(), Otp.TYPE_REGISTER, 15);
+        String otpCode = otpService.generateOtp(identifier.toString(), Otp.TYPE_REGISTER, 15, null);
         userDto.setOtp(otpCode);
         userService.sendOTPVerification(userDto);
         return new BaseResponse<>(
@@ -69,6 +69,28 @@ public class AuthUserController {
             return new BaseResponse<>(false, "Registered Failed, Invalid OTP.", null);
         }
         return new BaseResponse<>(true, "Registered Successfully.", null);
+    }
+
+    @PostMapping("/register-resend")
+    public BaseResponse<Object> registerResend(
+            @RequestParam("email") String email,
+            @RequestParam("identifier") String identifier
+    ) {
+        UUID newIdentifier = UUID.randomUUID();
+        String otpToken = otpService.regenerateOtp(identifier, newIdentifier.toString(), Otp.TYPE_REGISTER);
+        if(otpToken != null) {
+            RegisterDto userDto = new RegisterDto(null, null, null, email, null, otpToken);
+            userService.sendOTPVerification(userDto);
+        } else {
+            return new BaseResponse<>(false, "Something Went Wrong, Please refresh the page.", null);
+        }
+        return new BaseResponse<>(
+                true,
+                "Resent OTP Successfully.",
+                new RegisterOTPResponse(
+                    newIdentifier.toString()
+                )
+        );
     }
 
     @PostMapping("/login")
