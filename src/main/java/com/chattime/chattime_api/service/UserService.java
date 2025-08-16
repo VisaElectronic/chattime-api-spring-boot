@@ -1,10 +1,9 @@
 package com.chattime.chattime_api.service;
 
 import com.chattime.chattime_api.dto.UserDto;
-import com.chattime.chattime_api.dto.auth.LoginDto;
-import com.chattime.chattime_api.dto.auth.RegisterDto;
-import com.chattime.chattime_api.dto.auth.VerifyRegisterDto;
+import com.chattime.chattime_api.dto.auth.*;
 import com.chattime.chattime_api.dto.request.ProfileUpdateDto;
+import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.model.User;
 import com.chattime.chattime_api.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -180,5 +180,69 @@ public class UserService {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    @Async
+    public void sendForgotPassword(ForgotPasswordDto data) {
+        try {
+            // 1. Convert the data object to a JSON string (raw request body)
+            String jsonBody = objectMapper.writeValueAsString(data);
+
+            // 2. Calculate the HMAC-SHA256 hash of the JSON body
+            String hash = calculateHmacSha256(jsonBody, appRequestSecret);
+
+            // 3. Prepare headers for the outgoing request to Laravel
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-Signed-Key", hash); // Set the custom header for Laravel to verify
+
+            // 4. Create the HTTP entity (body + headers)
+            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+
+            // 5. Send the POST request to the Laravel API
+            ResponseEntity<String> response = restTemplate.exchange(
+                    adminApiUrl + "/api/v1/send-forgot-password",
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+            logger.info(response.toString());
+
+        } catch (Exception ex) {
+            logger.error(ex.toString());
+        }
+    }
+
+    public BaseResponse<Object> sendResetPassword(ResetPasswordDto data) {
+        try {
+            // 1. Convert the data object to a JSON string (raw request body)
+            String jsonBody = objectMapper.writeValueAsString(data);
+
+            // 2. Calculate the HMAC-SHA256 hash of the JSON body
+            String hash = calculateHmacSha256(jsonBody, appRequestSecret);
+
+            // 3. Prepare headers for the outgoing request to Laravel
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-Signed-Key", hash); // Set the custom header for Laravel to verify
+
+            // 4. Create the HTTP entity (body + headers)
+            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+
+            // 5. Send the POST request to the Laravel API
+            ResponseEntity<BaseResponse<Object>> response = restTemplate.exchange(
+                    adminApiUrl + "/api/v1/reset-password",
+                    HttpMethod.POST,
+                    requestEntity,
+                    new ParameterizedTypeReference<BaseResponse<Object>>() {}
+            );
+            logger.info(response.toString());
+
+            return response.getBody();
+
+        } catch (Exception ex) {
+            logger.error(ex.toString());
+        }
+        return new BaseResponse<>(false, "Something Went Wrong", null);
     }
 }

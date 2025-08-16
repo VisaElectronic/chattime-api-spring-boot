@@ -1,8 +1,6 @@
 package com.chattime.chattime_api.controller;
 
-import com.chattime.chattime_api.dto.auth.LoginDto;
-import com.chattime.chattime_api.dto.auth.RegisterDto;
-import com.chattime.chattime_api.dto.auth.VerifyRegisterDto;
+import com.chattime.chattime_api.dto.auth.*;
 import com.chattime.chattime_api.dto.response.BaseResponse;
 import com.chattime.chattime_api.dto.response.login.LoginDataResponse;
 import com.chattime.chattime_api.dto.response.register.RegisterOTPResponse;
@@ -91,6 +89,30 @@ public class AuthUserController {
                     newIdentifier.toString()
                 )
         );
+    }
+
+    @PostMapping("/forgot-password")
+    public BaseResponse<Object> forgotPassword(
+            @RequestParam("email") String email
+    ) {
+        ForgotPasswordDto data = new ForgotPasswordDto(email);
+        userService.sendForgotPassword(data);
+        return new BaseResponse<>(true, "Forgot Password Email is sent successfully.", null);
+    }
+
+    @PostMapping("/reset-password")
+    public BaseResponse<Object> resetPassword(
+            @RequestParam("email") String email,
+            @RequestParam("token") String token,
+            @RequestParam("password") String password,
+            @RequestParam("confirmPassword") String confirmPassword
+    ) {
+        ResetPasswordDto data = new ResetPasswordDto(email, token, password, confirmPassword);
+        BaseResponse<Object> response = userService.sendResetPassword(data);
+        if(response.getSuccess()) {
+            return new BaseResponse<>(true, "Reset Password Successfully.", null);
+        }
+        return new BaseResponse<>(false, "Failed Reset Password.", null);
     }
 
     @PostMapping("/login")
