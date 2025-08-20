@@ -35,6 +35,10 @@ public class AuthUserController {
         @RequestParam("email") String email,
         @RequestParam("phone") String phone
     ) {
+        User checkUser = userService.findByEmail(email);
+        if(checkUser != null) {
+            return new BaseResponse<>(false, "This Email is already registered.", null);
+        }
         RegisterDto userDto = new RegisterDto(firstname.toLowerCase(), firstname, lastname, email, phone, null);
         UUID identifier = UUID.randomUUID();
         String otpCode = otpService.generateOtp(identifier.toString(), Otp.TYPE_REGISTER, 15, null);
@@ -95,6 +99,10 @@ public class AuthUserController {
     public BaseResponse<Object> forgotPassword(
             @RequestParam("email") String email
     ) {
+        User user = userService.findByEmail(email);
+        if(user == null) {
+            return new BaseResponse<>(false, "User Not Found.", null);
+        }
         ForgotPasswordDto data = new ForgotPasswordDto(email);
         userService.sendForgotPassword(data);
         return new BaseResponse<>(true, "Forgot Password Email is sent successfully.", null);
