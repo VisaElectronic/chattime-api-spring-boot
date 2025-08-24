@@ -106,7 +106,6 @@ public class GroupController {
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
-        List<Channel> channels = channelService.findAllByKeyIn(channelKeys);
         Group group = groupService.findByKey(groupKey);
         groupService.save(
             groupKey,
@@ -116,7 +115,7 @@ public class GroupController {
             photo,
             true
         );
-        groupService.saveGroupChannels(group, channels, currentUser);
+        List<Channel> channels = groupService.updateGroupChannels(group, channelKeys, currentUser);
 
         List<ChannelData> channelMaps = channels.stream()
                 .map(ch -> new ChannelData(

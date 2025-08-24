@@ -150,6 +150,16 @@ public class GroupService {
         groupRepository.save(group);
     }
 
+    public List<Channel> updateGroupChannels(
+            Group group,
+            List<String> channelKeys,
+            User currentUser
+    ) {
+        List<Channel> channels = channelRepository.findChannelsByKeysNotInGroup(channelKeys, group.getKey());
+        this.saveGroupChannels(group, channels, currentUser);
+        return channels;
+    }
+
     public List<Group> findGroupsWithKeys(String key1, String key2, boolean isGroup) {
         return groupRepository.findGroupsContainingKeys(Arrays.asList(key1, key2), isGroup ? 1 : 0);
     }

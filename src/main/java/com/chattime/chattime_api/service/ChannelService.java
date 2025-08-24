@@ -45,4 +45,8 @@ public class ChannelService {
     }
 
     public List<Channel> findAllNotInGroup(String key) {return channelRepository.findAllNotInGroup(key);}
+
+    public List<Channel> findChannelsByKeysNotInGroup(List<String> keys, String groupKey) {
+        return channelRepository.findChannelsByKeysNotInGroup(keys, groupKey);
+    }
 }

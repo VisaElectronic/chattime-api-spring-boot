@@ -10,5 +10,6 @@ CREATE TABLE groups_channels (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_channel_id FOREIGN KEY (channel_id) REFERENCES channels(id),
     CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES groups(id),
-    CONSTRAINT fk_last_message_id FOREIGN KEY (last_message_id) REFERENCES messages(id)
+    CONSTRAINT fk_last_message_id FOREIGN KEY (last_message_id) REFERENCES messages(id),
+    CONSTRAINT uq_group_channel UNIQUE (group_id, channel_id)
 );
