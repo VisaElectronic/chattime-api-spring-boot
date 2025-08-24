@@ -41,11 +41,11 @@ public class ContactController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = ((UserPrincipal) authentication.getPrincipal()).getUser();
         if(addContactDto.getPhoneNumber() == null) {
-            return new BaseResponse<>(false, "Invalid Phone Number.", null);
+            return new BaseResponse<>(false, "Invalid Email.", null);
         }
-        User user = userService.findByPhone(addContactDto.getPhoneNumber());
+        User user = userService.findByEmail(addContactDto.getPhoneNumber());
         if(user == null) {
-            return new BaseResponse<>(false, "The person with this phone number is not registered on App yet.", null);
+            return new BaseResponse<>(false, "The person with this email is not registered on App yet.", null);
         }
         if(Objects.equals(currentUser.getEmail(), user.getEmail())) {
             return new BaseResponse<>(false, "You can't add yourself as a contact.", null);
@@ -56,7 +56,7 @@ public class ContactController {
         List<Group> existingGroups = groupService.findGroupsWithKeys(channel1.getKey(), channel2.getKey(), false);
         if (!existingGroups.isEmpty()) {
             Group firstGroup = existingGroups.getFirst();
-            return new BaseResponse<>(false, "You already has a contact with this phone's owner.", null);
+            return new BaseResponse<>(false, "You already has a contact with this email's owner.", null);
         }
         String key = UUID.randomUUID().toString();
         Group group = groupService.save(
